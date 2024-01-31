@@ -1,4 +1,4 @@
-import type { Color } from "../ts/generic.ts";
+import type { Color } from "../ts/generic";
 
 export default {
 	white: "rgb(255,255,255)",

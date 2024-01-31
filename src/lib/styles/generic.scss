@@ -1,0 +1,56 @@
+:global(body) {
+	background-color: $black;
+}
+
+:global(*) {
+	margin: 0;
+	padding: 0;
+
+	// @include scrollbar($black-2, $gray-1);
+
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+:global(a) {
+	text-decoration: none;
+	// color: $purple-4;
+	@include inter(600);
+	cursor: pointer;
+
+	&.disabled {
+		@include disabled;
+	}
+}
+
+:global(li) {
+	list-style: none;
+}
+
+:global(.no-wrap) {
+	white-space: nowrap;
+}
+
+// @each $name, $gradient in $gradients {
+// 	.bg-#{$name} {
+// 		background: $gradient;
+// 	}
+// }
+
+// @each $name, $gradient in $gradients {
+// 	.text-#{$name} {
+// 		@include textGradient($gradient);
+// 	}
+// }
+
+@each $name, $color in $colors {
+	:global(.text-#{$name}) {
+		color: $color !important;
+	}
+}
+
+@each $weight in (100, 200, 300, 400, 500, 600, 700, 800, 900) {
+	:global(.weight-#{$weight}) {
+		font-weight: $weight !important;
+	}
+}

@@ -1,0 +1,22 @@
+@mixin blatantFontFace($name, $weight, $style) {
+  font-family: Blatant;
+  src: url("/fonts/blatant/#{$name}");
+  font-weight: $weight;
+  font-style: $style;
+}
+
+@font-face {
+  @include blatantFontFace("Blatant.otf", 400, normal);
+}
+
+@font-face {
+  @include blatantFontFace("Blatant-Italic.otf", 400, italic);
+}
+
+@font-face {
+  @include blatantFontFace("Blatant-Bold.otf", 700, normal);
+}
+
+@font-face {
+  @include blatantFontFace("Blatant-BoldItalic.otf", 700, italic);
+}

@@ -2,68 +2,108 @@
 	import type { Color, JustifyContent } from "$lib/ts/generic";
 	import colors from "$lib/constants/colors";
 	import { alphaColor, classNames, offsetColor, styles } from "$lib/utils/generic";
+	import { openInNewTabProps } from "$lib/constants/generic";
 
-	export const variant: "contained" | "outlined" | "flat" = "contained";
-	export const size: "extra-small" | "small" | "medium" | "large" | "extra-large" = "medium";
+	export let variant: "contained" | "outlined" | "flat" = "contained";
+	export let size: "extra-small" | "small" | "medium" | "large" | "extra-large" = "medium";
 
-	export const color: Color = "black";
-	export const textColor: Color = "white";
-	export const iconColor: Color = textColor;
+	export let color: Color = "black";
+	export let textColor: Color = "white";
+	export let iconColor: Color = textColor;
 
-	export const justifyContent: JustifyContent = "space-between";
-	export const wrap: boolean = false;
+	export let justifyContent: JustifyContent = "space-between";
+	export let wrap: boolean = false;
 
-	export const rounded: boolean = false;
-	export const disabled: boolean = false;
-	export const readOnly: boolean = false;
-	export const disableHover: boolean = false;
-	export const isLoading: boolean = false;
-	export const active: boolean = false;
+	export let rounded: boolean = false;
+	export let disabled: boolean = false;
+	export let readOnly: boolean = false;
+	export let disableHover: boolean = false;
+	export let isLoading: boolean = false;
+	export let active: boolean = false;
+
+	export let href: string | undefined = undefined;
+	export let openInNewTab: boolean = false;
 
 	const hasStartIcon = $$slots["start-icon"];
 	const hasEndIcon = $$slots["end-icon"];
-
-	console.log({ hasEndIcon, hasStartIcon });
 </script>
 
-<button
-	style={styles({
-		"--color": colors[color],
-		"--color-offset-1": offsetColor(color, 0.3),
-		"--color-offset-2": offsetColor(color, 0.5),
-		"--color-alpha": alphaColor(color, 0.1),
+{#if !href}
+	<button
+		style={styles({
+			"--color": colors[color],
+			"--color-offset-1": offsetColor(color, 0.3),
+			"--color-offset-2": offsetColor(color, 0.5),
+			"--color-alpha": alphaColor(color, 0.1),
 
-		"--text-color": colors[textColor],
-		"--icon-color": colors[iconColor],
+			"--text-color": colors[textColor],
+			"--icon-color": colors[iconColor],
 
-		"--justify-content": justifyContent
-	})}
-	class={classNames(
-		"button",
-		readOnly && "read-only",
-		disableHover && "hover-disabled",
-		wrap && "wrap",
-		(hasStartIcon || hasEndIcon || justifyContent !== "space-between") && "do-justify",
-		isLoading && "is-loading",
-		active && "active",
+			"--justify-content": justifyContent
+		})}
+		class={classNames(
+			"button",
+			readOnly && "read-only",
+			disableHover && "hover-disabled",
+			wrap && "wrap",
+			(hasStartIcon || hasEndIcon || justifyContent !== "space-between") && "do-justify",
+			isLoading && "is-loading",
+			active && "active",
 
-		rounded && "rounded",
+			rounded && "rounded",
 
-		size,
-		variant
-	)}
->
-	<div class="button-inner">
-		<slot name="start-icon" class="button-icon" />
-		<span><slot /></span>
-		<slot name="end-icon" class="button-icon" />
-	</div>
-</button>
+			size,
+			variant
+		)}
+		{disabled}
+	>
+		<div class="button-inner">
+			<slot name="start-icon" class="button-icon" />
+			<span><slot /></span>
+			<slot name="end-icon" class="button-icon" />
+		</div>
+	</button>
+{:else}
+	<a
+		{...openInNewTab ? openInNewTabProps : {}}
+		{href}
+		style={styles({
+			"--color": colors[color],
+			"--color-offset-1": offsetColor(color, 0.3),
+			"--color-offset-2": offsetColor(color, 0.5),
+			"--color-alpha": alphaColor(color, 0.1),
+
+			"--text-color": colors[textColor],
+			"--icon-color": colors[iconColor],
+
+			"--justify-content": justifyContent
+		})}
+		class={classNames(
+			"button",
+			readOnly && "read-only",
+			disableHover && "hover-disabled",
+			wrap && "wrap",
+			(hasStartIcon || hasEndIcon || justifyContent !== "space-between") && "do-justify",
+			isLoading && "is-loading",
+			active && "active",
+			disabled && "disabled",
+
+			rounded && "rounded",
+
+			size,
+			variant
+		)}
+	>
+		<div class="button-inner">
+			<slot name="start-icon" class="button-icon" />
+			<span><slot /></span>
+			<slot name="end-icon" class="button-icon" />
+		</div>
+	</a>
+{/if}
 
 <style lang="scss">
-	@import "../../../styles/styles.scss";
-
-	button {
+	.button {
 		$color: var(--color);
 		$colorOffset1: var(--color-offset-1);
 		$colorOffset2: var(--color-offset-2);
@@ -93,7 +133,8 @@
 			box-shadow 75ms ease-out,
 			width 300ms ease;
 
-		&:disabled {
+		&:disabled,
+		&.disabled {
 			@include disabled;
 		}
 
