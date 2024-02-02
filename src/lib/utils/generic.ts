@@ -25,7 +25,7 @@ export const alphaColor = (color: Color, alpha: number) => {
 	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-const discordAuthCallbackUrl = `${window.location.origin}/auth/callback`;
+export const discordAuthCallbackUrl = `${window.location.origin}/auth/callback`;
 
 export const generateDiscordAuthUrl = () =>
 	`https://discord.com/oauth2/authorize?${[
