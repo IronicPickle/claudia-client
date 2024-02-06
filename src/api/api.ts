@@ -1,6 +1,6 @@
-import config from "../config/config.ts";
-import type { ApiError } from "../../../claudia-shared/lib/ts/api/generic.ts";
-import { GenericErrorCode } from "../../../claudia-shared/lib/enums/api.ts";
+import config from "$config/config.ts";
+import type { ApiError } from "$shared/lib/ts/api/generic.ts";
+import { GenericErrorCode } from "$shared/lib/enums/api.ts";
 import ky, { type KyResponse } from "ky";
 
 const isKyError = (

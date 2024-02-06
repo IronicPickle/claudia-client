@@ -1,6 +1,6 @@
-import config from "../../config/config";
-import colors, { darkColors } from "../constants/colors";
-import type { Color } from "../ts/generic";
+import config from "$config/config";
+import colors, { darkColors } from "$constants/colors";
+import type { Color } from "$ts/generic";
 import pSBC from "./pSBC";
 
 export const styles = (styles: Record<string, any> = {}) =>

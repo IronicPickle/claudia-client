@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Color, JustifyContent } from "$lib/ts/generic";
-	import colors from "$lib/constants/colors";
-	import { alphaColor, classNames, offsetColor, styles } from "$lib/utils/generic";
-	import { openInNewTabProps } from "$lib/constants/generic";
+	import type { Color, JustifyContent } from "$ts/generic";
+	import colors from "$constants/colors";
+	import { alphaColor, classNames, offsetColor, styles } from "$utils/generic";
+	import { openInNewTabProps } from "$constants/generic";
 
 	export let variant: "contained" | "outlined" | "flat" = "contained";
 	export let size: "extra-small" | "small" | "medium" | "large" | "extra-large" = "medium";

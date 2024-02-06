@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from "$lib/components/common/generic/Button.svelte";
-	import { generateDiscordAuthUrl } from "$lib/utils/generic";
+	import { generateDiscordAuthUrl } from "$utils/generic";
 
 	const authUrl = generateDiscordAuthUrl();
 </script>

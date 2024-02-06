@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { discordAuthCallbackUrl } from "$lib/utils/generic";
-	import Endpoints from "../../../api/Endpoints";
+	import { discordAuthCallbackUrl } from "$utils/generic";
+	import Endpoints from "$api/Endpoints";
 
 	const urlParams = new URLSearchParams(window.location.search);
 	const code = urlParams.get("code");
