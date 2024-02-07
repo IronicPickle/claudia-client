@@ -1,7 +1,62 @@
 import config from "$config/config.ts";
-import type { ApiError } from "$shared/lib/ts/api/generic.ts";
+import type { ApiError, ApiTokens } from "$shared/lib/ts/api/generic.ts";
 import { GenericErrorCode } from "$shared/lib/enums/api.ts";
 import ky, { type KyResponse } from "ky";
+import StorageItem from "$objects/StorageItem";
+import { jwtDecode } from "jwt-decode";
+import dayjs from "dayjs";
+import { devLog } from "$utils/generic";
+import Endpoints from "./Endpoints";
+
+const session = new StorageItem<ApiTokens>("session");
+
+const checkTokenHasExpired = async (accessToken: string) => {
+	try {
+		const payload = jwtDecode(accessToken);
+
+		if (!payload) return null;
+
+		const { exp } = payload as any;
+
+		if (!exp) return null;
+
+		const expiry = dayjs.unix(exp);
+
+		const diff = expiry.diff();
+		const minutesLeft = diff / 1000 / 60;
+
+		const hasExpired = minutesLeft <= 1;
+
+		devLog(`Current session:\nMinutes left: ${minutesLeft}\nHas Expired: ${hasExpired}`);
+
+		return hasExpired;
+	} catch (err: any) {
+		// logErrorToSanity(err.message, err.stack);
+		return true;
+	}
+};
+
+const refreshSession = async (refreshToken: string) => {
+	const { data, error } = await Endpoints.auth.refresh.call({
+		body: {
+			refreshToken
+		}
+	});
+
+	if (error) {
+		// logErrorToSanity(err.message, err.stack);
+		return;
+	}
+	if (data) session.set(data.tokens);
+};
+
+const createAuthorizationHeader = () => {
+	let { data, error } = session.get();
+	if (error || !data) return null;
+	const { sessionToken } = data;
+
+	return `BEARER ${sessionToken}`;
+};
 
 const isKyError = (
 	err: any
@@ -26,16 +81,20 @@ export const getErrorFromApiErr = async <K extends string | number | symbol>(
 };
 
 const injectJwt = async (req: Request) => {
-	// const currentJwt = req.headers.get("Authorization")?.replace("BEARER ", "");
-	// if (!currentJwt) {
-	//   const newJwt = await encodeSessionJwt("internal");
-	//   api.extend({
-	//     headers: {
-	//       Authorization: `BEARER ${newJwt}`,
-	//     },
-	//   });
-	//   req.headers.set("Authorization", newJwt);
-	// }
+	const { data, error } = session.get();
+	if (error || !data) return;
+
+	const { sessionToken, refreshToken } = data;
+
+	if (req.url?.includes("/auth")) return;
+
+	const expired = await checkTokenHasExpired(sessionToken);
+
+	if (expired) await refreshSession(refreshToken);
+
+	const authorizationHeader = createAuthorizationHeader();
+
+	if (authorizationHeader) req.headers.set("Authorization", authorizationHeader);
 };
 
 export const api = ky.create({

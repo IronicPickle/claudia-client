@@ -1,4 +1,12 @@
 <script>
+	import Endpoints from "$api/Endpoints";
+	import { onMount } from "svelte";
+
+	onMount(async () => {
+		const { data, error } = await Endpoints.users.me.get.call({});
+
+		console.log({ data, error });
+	});
 </script>
 
 <div class="root">

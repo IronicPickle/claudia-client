@@ -1,7 +1,11 @@
-import config from "$config/config";
+import config, { isDev } from "$config/config";
 import colors, { darkColors } from "$constants/colors";
 import type { Color } from "$ts/generic";
 import pSBC from "./pSBC";
+
+export const devLog = (...text: any[]) => {
+	if (isDev) console.log("[Dev]", ">", ...text);
+};
 
 export const styles = (styles: Record<string, any> = {}) =>
 	Object.entries(styles)
