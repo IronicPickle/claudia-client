@@ -39,11 +39,15 @@ const config = {
 		alias: {
 			$shared: "../claudia-shared",
 
+			$routes: "./src/routes",
+
+			$components: "./src/lib/components/",
 			$constants: "./src/lib/constants/",
 			$enums: "./src/lib/enums/",
 			$objects: "./src/lib/objects/",
 			$ts: "./src/lib/ts/",
 			$utils: "./src/lib/utils/",
+			$stores: "./src/lib/stores/",
 
 			$config: "./src/config/",
 			$api: "./src/api/"

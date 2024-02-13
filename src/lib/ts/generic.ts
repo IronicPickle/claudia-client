@@ -9,3 +9,6 @@ export type JustifyContent =
 	| "flex-start"
 	| "center"
 	| "flex-end";
+
+export type DiscordAvatarType = "jpg" | "jpeg" | "png" | "webp" | "gif";
+export type DiscordAvatarSize = number;

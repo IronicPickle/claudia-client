@@ -6,7 +6,7 @@
 </script>
 
 <main>
-	<Button color="white" textColor="black" href={authUrl} openInNewTab>
+	<Button color="white" textColor="black" href={authUrl}>
 		<!-- <div slot="start-icon" let:class={className} class={className}></div> -->
 		Login
 	</Button>

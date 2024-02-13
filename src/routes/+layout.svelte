@@ -1,18 +1,11 @@
-<script>
-	import Endpoints from "$api/Endpoints";
-	import { onMount } from "svelte";
-
-	onMount(async () => {
-		const { data, error } = await Endpoints.users.me.get.call({});
-
-		console.log({ data, error });
-	});
+<script lang="ts">
+	import Header from "$components/layout/Header.svelte";
 </script>
 
 <div class="root">
 	<div class="viewport-wrapper">
 		<div class="page-wrapper">
-			<header><h1>Claudia</h1></header>
+			<Header />
 			<slot />
 		</div>
 	</div>
@@ -41,15 +34,6 @@
 
 				min-height: inherit;
 				min-width: 0;
-
-				header {
-					padding: 16px 32px;
-
-					background-color: $white;
-					h1 {
-						@include inter(700);
-					}
-				}
 			}
 		}
 	}

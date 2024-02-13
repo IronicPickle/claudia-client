@@ -1,10 +1,19 @@
+import { browser } from "$app/environment";
 import config, { isDev } from "$config/config";
 import colors, { darkColors } from "$constants/colors";
-import type { Color } from "$ts/generic";
+import type { Color, DiscordAvatarSize, DiscordAvatarType } from "$ts/generic";
 import pSBC from "./pSBC";
 
 export const devLog = (...text: any[]) => {
 	if (isDev) console.log("[Dev]", ">", ...text);
+};
+
+export const pushError = (...args: any[]) => {
+	devLog(...args);
+
+	// TODO
+	// Push to snackbar store
+	// Push to external error log (sanity maybe)
 };
 
 export const styles = (styles: Record<string, any> = {}) =>
@@ -29,7 +38,7 @@ export const alphaColor = (color: Color, alpha: number) => {
 	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-export const discordAuthCallbackUrl = `${window.location.origin}/auth/callback`;
+export const discordAuthCallbackUrl = browser ? `${window.location.origin}/auth/callback` : "";
 
 export const generateDiscordAuthUrl = () =>
 	`https://discord.com/oauth2/authorize?${[
@@ -40,3 +49,10 @@ export const generateDiscordAuthUrl = () =>
 		`redirect_uri=${encodeURIComponent(discordAuthCallbackUrl)}`,
 		`prompt=consent`
 	].join("&")}`;
+
+export const generateDiscordAvatarUrl = (
+	userId: string,
+	avatarhash: string,
+	size: DiscordAvatarSize = 80,
+	format: DiscordAvatarType = "png"
+) => `https://cdn.discordapp.com/avatars/${userId}/${avatarhash}.${format}?size=${size}`;

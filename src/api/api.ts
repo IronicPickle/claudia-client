@@ -1,12 +1,19 @@
 import config from "$config/config.ts";
-import type { ApiError, ApiTokens } from "$shared/lib/ts/api/generic.ts";
+import type {
+	ApiCallRes,
+	ApiError,
+	ApiTokens,
+	RequestDetails,
+	RequestResponse
+} from "$shared/lib/ts/api/generic.ts";
 import { GenericErrorCode } from "$shared/lib/enums/api.ts";
 import ky, { type KyResponse } from "ky";
 import StorageItem from "$objects/StorageItem";
 import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";
-import { devLog } from "$utils/generic";
+import { devLog, pushError } from "$utils/generic";
 import Endpoints from "./Endpoints";
+import { isResError } from "$shared/lib/utils/api";
 
 const session = new StorageItem<ApiTokens>("session");
 
@@ -31,23 +38,23 @@ const checkTokenHasExpired = async (accessToken: string) => {
 
 		return hasExpired;
 	} catch (err: any) {
-		// logErrorToSanity(err.message, err.stack);
+		pushError(err);
 		return true;
 	}
 };
 
 const refreshSession = async (refreshToken: string) => {
-	const { data, error } = await Endpoints.auth.refresh.call({
+	const res = await Endpoints.auth.refresh.call({
 		body: {
 			refreshToken
 		}
 	});
 
-	if (error) {
-		// logErrorToSanity(err.message, err.stack);
-		return;
+	if (isResError(res)) {
+		pushError(res.error.error);
+	} else {
+		session.set(res.data.tokens);
 	}
-	if (data) session.set(data.tokens);
 };
 
 const createAuthorizationHeader = () => {
@@ -110,23 +117,14 @@ export const api = ky.create({
 	}
 });
 
-export interface ApiCallRes<R> {
-	error: ApiError<keyof R> | undefined;
-	data: R | undefined;
-}
-
-export const apiCall = async <R>(func: () => Promise<R>) => {
-	const res: ApiCallRes<R> = {
-		data: undefined,
-		error: undefined
-	};
+export const apiCall = async <RD extends RequestDetails>(
+	func: () => Promise<RequestResponse<RD>>
+): Promise<ApiCallRes<RD>> => {
 	try {
 		const data = await func();
-		res.data = data;
+		return { data };
 	} catch (err: any) {
 		const error = await getErrorFromApiErr(err);
-		res.error = error;
+		return { error };
 	}
-
-	return res;
 };
