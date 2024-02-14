@@ -1,13 +1,15 @@
 <script lang="ts">
-	import type { Color, JustifyContent } from "$ts/generic";
 	import colors from "$constants/colors";
-	import { alphaColor, classNames, offsetColor, styles } from "$utils/generic";
 	import { openInNewTabProps } from "$constants/generic";
+	import type { Color, JustifyContent } from "$ts/generic";
+	import { alphaColor, classNames, offsetColor, styles } from "$utils/generic";
 
-	export let variant: "contained" | "outlined" | "flat" = "contained";
-	export let size: "extra-small" | "small" | "medium" | "large" | "extra-large" = "medium";
+	export let fontSize: string = "24px";
 
-	export let color: Color = "black";
+	export let color: Color = "blue-1";
+	export let borderColor: Color = "blue-5";
+	export let innerShadowColor: Color = "black";
+	export let outerShadowColor: Color = "black";
 	export let textColor: Color = "white";
 	export let iconColor: Color = textColor;
 
@@ -24,61 +26,29 @@
 	export let href: string | undefined = undefined;
 	export let openInNewTab: boolean = false;
 
-	const hasStartIcon = $$slots["start-icon"];
-	const hasEndIcon = $$slots["end-icon"];
-</script>
+	const hasStartIcon = $$slots["start"];
+	const hasEndIcon = $$slots["end"];
 
-{#if !href}
-	<button
-		style={styles({
+	const sharedProps:
+		| svelteHTML.HTMLAttributes<HTMLButtonElement>
+		| svelteHTML.HTMLAttributes<HTMLAnchorElement> = {
+		style: styles({
+			"--font-size": fontSize,
+
 			"--color": colors[color],
-			"--color-offset-1": offsetColor(color, 0.3),
-			"--color-offset-2": offsetColor(color, 0.5),
-			"--color-alpha": alphaColor(color, 0.1),
+			"--color-offset-1": offsetColor(color, 0.1),
+			"--color-offset-2": offsetColor(color, 0.25),
 
+			"--inner-shadow-color": colors[innerShadowColor],
+			"--outer-shadow-color": alphaColor(outerShadowColor, 0.25),
+
+			"--border-color": colors[borderColor],
 			"--text-color": colors[textColor],
 			"--icon-color": colors[iconColor],
 
 			"--justify-content": justifyContent
-		})}
-		class={classNames(
-			"button",
-			readOnly && "read-only",
-			disableHover && "hover-disabled",
-			wrap && "wrap",
-			(hasStartIcon || hasEndIcon || justifyContent !== "space-between") && "do-justify",
-			isLoading && "is-loading",
-			active && "active",
-
-			rounded && "rounded",
-
-			size,
-			variant
-		)}
-		{disabled}
-	>
-		<div class="button-inner">
-			<slot name="start-icon" class="button-icon" />
-			<span><slot /></span>
-			<slot name="end-icon" class="button-icon" />
-		</div>
-	</button>
-{:else}
-	<a
-		{...openInNewTab ? openInNewTabProps : {}}
-		{href}
-		style={styles({
-			"--color": colors[color],
-			"--color-offset-1": offsetColor(color, 0.3),
-			"--color-offset-2": offsetColor(color, 0.5),
-			"--color-alpha": alphaColor(color, 0.1),
-
-			"--text-color": colors[textColor],
-			"--icon-color": colors[iconColor],
-
-			"--justify-content": justifyContent
-		})}
-		class={classNames(
+		}),
+		class: classNames(
 			"button",
 			readOnly && "read-only",
 			disableHover && "hover-disabled",
@@ -88,50 +58,72 @@
 			active && "active",
 			disabled && "disabled",
 
-			rounded && "rounded",
+			rounded && "rounded"
+		),
+		disabled
+	};
+</script>
 
-			size,
-			variant
-		)}
-	>
-		<div class="button-inner">
-			<slot name="start-icon" class="button-icon" />
+{#if !href}
+	<button {...sharedProps}>
+		<div class="inner">
+			<slot name="start" />
 			<span><slot /></span>
-			<slot name="end-icon" class="button-icon" />
+			<slot name="end" />
 		</div>
+
+		<div class="shadow top" />
+		<div class="shadow right" />
+		<div class="shadow bottom" />
+		<div class="shadow left" />
+	</button>
+{:else}
+	<a {...openInNewTab ? openInNewTabProps : {}} {href} {...sharedProps}>
+		<div class="inner">
+			<slot name="start-icon" />
+			<span><slot /></span>
+			<slot name="end-icon" />
+		</div>
+
+		<div class="shadow top" />
+		<div class="shadow right" />
+		<div class="shadow bottom" />
+		<div class="shadow left" />
 	</a>
 {/if}
 
 <style lang="scss">
-	.button {
-		$color: var(--color);
-		$colorOffset1: var(--color-offset-1);
-		$colorOffset2: var(--color-offset-2);
-		$colorAlpha: var(--color-alpha);
+	$fontSize: var(--font-size);
 
-		$textColor: var(--text-color);
-		$iconColor: var(--icon-color);
+	$color: var(--color);
+	$colorOffset1: var(--color-offset-1);
+	$colorOffset2: var(--color-offset-2);
 
-		$justifyContent: var(--justify-content);
+	$innerShadowColor: var(--inner-shadow-color);
+	$outerShadowColor: var(--outer-shadow-color);
+	$borderColor: var(--border-color);
+	$textColor: var(--text-color);
+	$iconColor: var(--icon-color);
 
-		display: inline-block;
+	$justifyContent: var(--justify-content);
 
-		height: fit-content;
+	button,
+	a {
+		position: relative;
 
-		border: 0;
-		box-shadow: 0 0 0 1px transparent;
+		background-color: $color;
+		border: 0.2em solid $borderColor;
+		box-shadow: 0 0 0.04em 0.04em $outerShadowColor;
+		border-radius: 0.4em;
 
+		@include quantico(700);
+		font-size: $fontSize;
 		color: $textColor;
+		text-transform: uppercase;
 
+		overflow: hidden;
 		cursor: pointer;
-		box-sizing: border-box;
-
-		transition:
-			background-color 300ms ease,
-			border-radius 300ms ease,
-			color 300ms ease,
-			box-shadow 75ms ease-out,
-			width 300ms ease;
+		transition: background-color 200ms ease;
 
 		&:disabled,
 		&.disabled {
@@ -143,7 +135,7 @@
 		}
 
 		&:not(.wrap) {
-			.button-inner {
+			.inner {
 				& > span {
 					@include textOverflow;
 				}
@@ -151,182 +143,95 @@
 		}
 
 		&.do-justify {
-			.button-inner {
+			.inner {
 				justify-content: $justifyContent;
 			}
 		}
 
-		.button-inner {
-			position: relative;
+		&:not(.hover-disabled) {
+			&:hover {
+				background-color: $colorOffset1;
+
+				.shadow {
+					box-shadow: 0 0 0.4em 0.08em $innerShadowColor;
+				}
+			}
+
+			&:active,
+			&.active {
+				background-color: $colorOffset2;
+
+				.shadow {
+					box-shadow: 0 0 0.6em 0.1em $innerShadowColor;
+				}
+			}
+		}
+
+		.inner {
 			display: flex;
 			align-items: center;
-			justify-content: center;
 
-			& > span {
-				display: inline-flex;
-				align-items: center;
-				gap: 8px;
+			padding: 0.5em 0.8em;
 
-				// @include inter(600);
-			}
-		}
+			:global(> *:not(span):not(.not-icon)) {
+				@include size(1.2em);
 
-		:global(.button-icon) {
-			color: $iconColor;
-		}
+				color: $iconColor;
 
-		&.contained {
-			background-color: $color;
-			box-shadow: 0 0 0 1px $color;
-
-			&:not(.hover-disabled) {
-				&:hover {
-					background-color: $colorOffset1;
-					box-shadow: 0 0 0 1px $colorOffset1;
+				&:first-child {
+					margin-right: 0.6em;
 				}
 
-				&:active,
-				&.active {
-					background-color: $colorOffset1;
-					box-shadow: 0 0 0 2px $colorOffset1;
+				&:last-child {
+					margin-left: 0.6em;
 				}
 			}
 		}
 
-		&.outlined {
-			background-color: transparent;
+		.shadow {
+			position: absolute;
 
-			box-shadow: 0 0 0 1px $color;
+			box-shadow: 0 0 0.2em 0.04em $innerShadowColor;
 
-			&:not(.hover-disabled) {
-				&:hover {
-					background-color: $colorAlpha;
-					box-shadow: 0 0 0 1px $colorOffset1;
-				}
+			font-size: inherit;
 
-				&:active,
-				&.active {
-					background-color: $colorAlpha;
-					box-shadow: 0 0 0 2px $colorOffset2;
-				}
-			}
-		}
+			transition: box-shadow 200ms ease;
 
-		&.flat {
-			background-color: transparent;
+			&.top {
+				left: 0;
+				top: 0;
+				right: 0;
 
-			&:not(.hover-disabled) {
-				&:hover {
-					background-color: $colorAlpha;
-					box-shadow: 0 0 0 1px $colorAlpha;
-				}
-
-				&:active,
-				&.active {
-					background-color: $colorAlpha;
-					box-shadow: 0 0 0 2px $colorAlpha;
-				}
-			}
-		}
-
-		@mixin sizing(
-			$vertical-padding,
-			$horizontal-padding,
-			$border-radius,
-			$font-size,
-			$icon-size,
-			$icon-spacing,
-			$scale,
-			$translate
-		) {
-			padding: $vertical-padding $horizontal-padding;
-
-			border-radius: $border-radius;
-
-			font-size: $font-size;
-
-			:global(.button-icon) {
-				&:not(.not-icon) {
-					@include size($icon-size);
-				}
-
-				&:first-child:not(.not-icon) {
-					margin-right: $icon-spacing;
-				}
-
-				&:last-child:not(.not-icon) {
-					margin-left: $icon-spacing;
-				}
+				height: 0;
+				width: 100%;
 			}
 
-			&.rounded {
-				border-radius: calc($border-radius * 4.3);
+			&.right {
+				top: 0;
+				right: 0;
+				bottom: 0;
+
+				height: 100%;
+				width: 0;
 			}
-		}
 
-		&.extra-small {
-			@include sizing(
-				$vertical-padding: 3px,
-				$horizontal-padding: 5.5px,
-				$border-radius: 3px,
-				$font-size: 10px,
-				$icon-size: 12px,
-				$icon-spacing: 4px,
-				$scale: 0.175,
-				$translate: -32px
-			);
-		}
+			&.bottom {
+				right: 0;
+				bottom: 0;
+				left: 0;
 
-		&.small {
-			@include sizing(
-				$vertical-padding: 7px,
-				$horizontal-padding: 9px,
-				$border-radius: 4px,
-				$font-size: 12px,
-				$icon-size: 15px,
-				$icon-spacing: 6px,
-				$scale: 0.225,
-				$translate: -30px
-			);
-		}
+				height: 0;
+				width: 100%;
+			}
 
-		&.medium {
-			@include sizing(
-				$vertical-padding: 12px,
-				$horizontal-padding: 18px,
-				$border-radius: 6px,
-				$font-size: 14px,
-				$icon-size: 17px,
-				$icon-spacing: 8px,
-				$scale: 0.25,
-				$translate: -30px
-			);
-		}
+			&.left {
+				bottom: 0;
+				left: 0;
+				top: 0;
 
-		&.large {
-			@include sizing(
-				$vertical-padding: 18px,
-				$horizontal-padding: 27px,
-				$border-radius: 8px,
-				$font-size: 16px,
-				$icon-size: 20px,
-				$icon-spacing: 10px,
-				$scale: 0.3,
-				$translate: -28px
-			);
-		}
-
-		&.extra-large {
-			@include sizing(
-				$vertical-padding: 28px,
-				$horizontal-padding: 42px,
-				$border-radius: 10px,
-				$font-size: 24px,
-				$icon-size: 29px,
-				$icon-spacing: 14px,
-				$scale: 0.4,
-				$translate: -25px
-			);
+				height: 100%;
+				width: 0;
+			}
 		}
 	}
 </style>

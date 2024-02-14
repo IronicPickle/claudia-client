@@ -1,0 +1,22 @@
+@mixin quanticoFontFace($name, $weight, $style) {
+	font-family: Quantico;
+	src: url("/fonts/quantico/#{$name}");
+	font-weight: $weight;
+	font-style: $style;
+}
+
+@font-face {
+	@include quanticoFontFace("Quantico-Regular.ttf", 400, normal);
+}
+
+@font-face {
+	@include quanticoFontFace("Quantico-Italic.ttf", 400, italic);
+}
+
+@font-face {
+	@include quanticoFontFace("Quantico-Bold.ttf", 700, normal);
+}
+
+@font-face {
+	@include quanticoFontFace("Quantico-BoldItalic.ttf", 700, italic);
+}

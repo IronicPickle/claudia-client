@@ -1,9 +1,11 @@
 <script lang="ts">
-	import { generateDiscordAvatarUrl } from "$utils/generic";
-
 	import me from "$stores/me";
+
+	import { generateDiscordAvatarUrl } from "$utils/generic";
 	import { derived } from "svelte/store";
 	import Avatar from "$components/common/generic/Avatar.svelte";
+
+	import MdiCat from "~icons/mdi/cat";
 
 	const { state: meState } = me;
 
@@ -16,11 +18,11 @@
 
 <header>
 	<div class="wrapper">
-		<h1>Claudia</h1>
+		<h1><MdiCat /> Claudia</h1>
 
 		<div class="user-details">
 			<div class="text-wrapper">
-				<h1>{$meState.data?.discordUser.username}</h1>
+				<h2>{$meState.data?.discordUser.username}</h2>
 			</div>
 			<Avatar src={$avatarUrl} alt="Discord avatar" size={64} />
 		</div>
@@ -31,7 +33,7 @@
 	header {
 		padding: 16px 32px;
 
-		background-color: $white;
+		background-color: $black-3;
 
 		.wrapper {
 			display: flex;
@@ -40,15 +42,30 @@
 
 			width: 100%;
 
+			h1 {
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+
+				@include quantico(400);
+				font-size: 32px;
+				color: $white;
+
+				:global(svg) {
+					@include size(48px);
+				}
+			}
+
 			.user-details {
 				display: flex;
 				align-items: center;
 				gap: 16px;
 
 				.text-wrapper {
-					h1 {
+					h2 {
 						@include inter(500);
 						font-size: 16px;
+						color: $white;
 					}
 				}
 			}

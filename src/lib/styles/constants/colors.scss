@@ -2,8 +2,44 @@
 $white: rgb(255, 255, 255); // #FFF
 $black: rgb(0, 0, 0); // #000
 
+// Black
+$black-1: rgb(1, 1, 6); // #010106
+$black-2: rgb(5, 5, 10); // #05050A
+$black-3: rgb(10, 10, 17); // #0A0A11
+$black-4: rgb(13, 13, 20); //#0D0D14
+
+// Gray
+$gray-1: rgb(71, 66, 102); // #474266
+$gray-2: rgb(127, 124, 169); // #7F7CA9
+$gray-3: rgb(165, 162, 195); // #A5A2C3
+
+// Blue
+$blue-1: rgb(0, 36, 57); // #002439
+$blue-2: rgb(0, 80, 102); // 	#005066
+$blue-3: rgb(78, 121, 136); // 	#4e7988
+$blue-4: rgb(120, 204, 226); // 	#78cce2
+$blue-5: rgb(228, 239, 240); // 	#e4eff0
+
 $colors: (
 	// Generic
 	"white": $white,
-	"black": $black
+	"black": $black,
+
+	// Black
+	"black-1": $black-1,
+	"black-2": $black-2,
+	"black-3": $black-3,
+	"black-4": $black-4,
+
+	// Gray
+	"gray-1": $gray-1,
+	"gray-2": $gray-2,
+	"gray-3": $gray-3,
+
+	// Blue
+	"blue-1": $blue-1,
+	"blue-2": $blue-2,
+	"blue-3": $blue-3,
+	"blue-4": $blue-4,
+	"blue-5": $blue-5
 );
