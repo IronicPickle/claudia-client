@@ -1,8 +1,10 @@
 <script lang="ts">
 	import Header from "$components/layout/Header.svelte";
+	import NavDrawer from "./NavDrawer.svelte";
 </script>
 
 <div class="root">
+	<NavDrawer />
 	<div class="viewport-wrapper">
 		<div class="page-wrapper">
 			<Header />

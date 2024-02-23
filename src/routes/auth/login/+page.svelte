@@ -1,23 +1,27 @@
 <script lang="ts">
 	import Button from "$components/common/generic/Button.svelte";
+	import Pane from "$components/common/generic/Pane.svelte";
 	import { generateDiscordAuthUrl } from "$utils/generic";
 	import FaDiscord from "~icons/fa6-brands/discord";
+	import IoArrowForward from "~icons/ion/arrow-forward";
 
 	const authUrl = generateDiscordAuthUrl();
 </script>
 
 <main>
-	<div class="box">
-		<h1>Login</h1>
-		<h2>Connect your Discord account to access the Claudia</h2>
+	<Pane>
+		<div class="pane-inner">
+			<h1>Login</h1>
+			<h2>Connect your Discord account to access the Claudia</h2>
 
-		<FaDiscord class="icon" />
+			<FaDiscord class="icon" />
 
-		<Button fontSize="24px">
-			<FaDiscord slot="end" />
-			Connect Discord
-		</Button>
-	</div>
+			<Button fontSize="24px" color="blue-2" href={authUrl}>
+				<IoArrowForward slot="end" />
+				Connect
+			</Button>
+		</div>
+	</Pane>
 </main>
 
 <style lang="scss">
@@ -28,19 +32,13 @@
 
 		min-height: inherit;
 
-		.box {
+		.pane-inner {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			gap: 24px;
 
 			max-width: 340px;
-
-			padding: 64px;
-
-			background-color: $black-2;
-			border-radius: 10px;
-			border: 2px solid $black-3;
 
 			h1 {
 				@include quantico(700);
@@ -57,7 +55,10 @@
 			}
 
 			:global(.icon) {
-				@include size(200px);
+				@include size(128px);
+
+				margin: 32px 0;
+
 				color: $blue-5;
 			}
 		}

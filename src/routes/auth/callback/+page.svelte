@@ -7,13 +7,15 @@
 	import { isResError } from "$shared/lib/utils/api";
 	import { goto } from "$app/navigation";
 
-	import me from "$stores/me";
+	import getMe from "$stores/getMe";
 
 	const urlParams = new URLSearchParams(window.location.search);
 	const code = urlParams.get("code");
 	const state = urlParams.get("state");
 
 	const { set: setSessionItem } = storageItem<ApiTokens>("session");
+
+	const me = getMe();
 
 	onMount(async () => {
 		if (code && state) {

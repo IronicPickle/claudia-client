@@ -1,7 +1,7 @@
 <script lang="ts">
 	import colors from "$constants/colors";
 	import { openInNewTabProps } from "$constants/generic";
-	import type { Color, JustifyContent } from "$ts/generic";
+	import type { Color } from "$ts/generic";
 	import { alphaColor, classNames, offsetColor, styles } from "$utils/generic";
 
 	type Variant = "contained" | "flat";
@@ -12,11 +12,7 @@
 	export let color: Color = "blue-1";
 	export let borderColor: Color = "blue-5";
 	export let innerShadowColor: Color = "black";
-	export let textColor: Color = "white";
-	export let iconColor: Color = textColor;
-
-	export let justifyContent: JustifyContent = "space-between";
-	export let wrap: boolean = false;
+	export let iconColor: Color = "white";
 
 	export let rounded: boolean = false;
 	export let disabled: boolean = false;
@@ -27,9 +23,6 @@
 
 	export let href: string | undefined = undefined;
 	export let openInNewTab: boolean = false;
-
-	const hasStartIcon = $$slots["start"];
-	const hasEndIcon = $$slots["end"];
 
 	const sharedProps:
 		| svelteHTML.HTMLAttributes<HTMLButtonElement>
@@ -46,17 +39,12 @@
 
 			"--border-color": colors[borderColor],
 			"--border-color-alpha": alphaColor(borderColor, 0.1),
-			"--text-color": colors[textColor],
-			"--icon-color": colors[iconColor],
-
-			"--justify-content": justifyContent
+			"--icon-color": colors[iconColor]
 		}),
 		class: classNames(
 			"button",
 			readOnly && "read-only",
 			disableHover && "hover-disabled",
-			wrap && "wrap",
-			(hasStartIcon || hasEndIcon || justifyContent !== "space-between") && "do-justify",
 			isLoading && "is-loading",
 			active && "active",
 			disabled && "disabled",
@@ -72,9 +60,7 @@
 {#if !href}
 	<button {...sharedProps} on:click>
 		<div class="inner">
-			<slot name="start" />
-			<span><slot /></span>
-			<slot name="end" />
+			<slot />
 		</div>
 
 		<div class="shadow top" />
@@ -85,9 +71,7 @@
 {:else}
 	<a {...openInNewTab ? openInNewTabProps : {}} {href} {...sharedProps}>
 		<div class="inner">
-			<slot name="start" />
-			<span><slot /></span>
-			<slot name="end" />
+			<slot />
 		</div>
 
 		<div class="shadow top" />
@@ -108,10 +92,7 @@
 	$innerShadowColor: var(--inner-shadow-color);
 	$borderColor: var(--border-color);
 	$borderColorAlpha: var(--border-color-alpha);
-	$textColor: var(--text-color);
 	$iconColor: var(--icon-color);
-
-	$justifyContent: var(--justify-content);
 
 	button,
 	a {
@@ -122,7 +103,6 @@
 
 		@include quantico(700);
 		font-size: $fontSize;
-		color: $textColor;
 		text-transform: uppercase;
 
 		overflow: hidden;
@@ -140,20 +120,6 @@
 
 		&.rounded {
 			border-radius: 50%;
-		}
-
-		&:not(.wrap) {
-			.inner {
-				& > span {
-					@include textOverflow;
-				}
-			}
-		}
-
-		&.do-justify {
-			.inner {
-				justify-content: $justifyContent;
-			}
 		}
 
 		&.flat {
@@ -214,20 +180,12 @@
 			display: flex;
 			align-items: center;
 
-			padding: 0.6em 1em;
+			padding: 0.7em;
 
 			:global(> *:not(span):not(.not-icon)) {
-				@include size(1.2em);
+				@include size(1.25em);
 
 				color: $iconColor;
-
-				&:first-child {
-					margin-right: 0.6em;
-				}
-
-				&:last-child {
-					margin-left: 0.6em;
-				}
 			}
 		}
 

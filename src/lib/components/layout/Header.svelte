@@ -1,15 +1,20 @@
 <script lang="ts">
-	import me from "$stores/me";
+	import getMe from "$stores/getMe";
 
 	import { generateDiscordAvatarUrl } from "$utils/generic";
 	import { derived } from "svelte/store";
 	import Avatar from "$components/common/generic/Avatar.svelte";
+	import Button from "$components/common/generic/Button.svelte";
+	import getNavDrawerIn from "$stores/getNavDrawerIn";
+	import IconButton from "$components/common/generic/IconButton.svelte";
 
-	import MdiCat from "~icons/mdi/cat";
+	import Logo from "$components/media/Logo.svelte";
+	import IonMenu from "~icons/ion/menu";
 
-	const { state: meState } = me;
+	const { store: meStore } = getMe();
+	const { set: setNavDrawerIn } = getNavDrawerIn();
 
-	let avatarUrl = derived(meState, ({ data }) =>
+	let avatarUrl = derived(meStore, ({ data }) =>
 		data?.discordUser.avatar
 			? generateDiscordAvatarUrl(data.discordUser.userId, data.discordUser.avatar)
 			: undefined
@@ -18,11 +23,23 @@
 
 <header>
 	<div class="wrapper">
-		<h1><MdiCat /> Claudia</h1>
+		<div class="left">
+			<IconButton
+				fontSize="18px"
+				variant="flat"
+				color="white"
+				iconColor="white"
+				rounded
+				on:click={() => setNavDrawerIn(true)}
+			>
+				<IonMenu />
+			</IconButton>
+			<h1><Logo /> Claudia</h1>
+		</div>
 
 		<div class="user-details">
 			<div class="text-wrapper">
-				<h2>{$meState.data?.discordUser.username}</h2>
+				<h2>{$meStore.data?.discordUser.username}</h2>
 			</div>
 			<Avatar src={$avatarUrl} alt="Discord avatar" size={64} />
 		</div>
@@ -42,17 +59,23 @@
 
 			width: 100%;
 
-			h1 {
-				display: inline-flex;
+			.left {
+				display: flex;
 				align-items: center;
-				gap: 8px;
+				gap: 12px;
+				h1 {
+					display: inline-flex;
+					align-items: center;
+					gap: 8px;
 
-				@include quantico(400);
-				font-size: 32px;
-				color: $white;
+					@include quantico(400);
+					font-size: 32px;
+					color: $white;
 
-				:global(svg) {
-					@include size(48px);
+					:global(svg) {
+						@include size(48px);
+						color: $white;
+					}
 				}
 			}
 

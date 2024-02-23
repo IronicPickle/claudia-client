@@ -3,6 +3,8 @@ import authRefresh from "./auth/refresh.ts";
 
 import usersMeGet from "./users/me/get.ts";
 
+import usersGuildsGetAll from "./users/[userId]/guilds/getAll.ts";
+
 export default abstract class Endpoints {
 	static auth = {
 		login: authLogin,
@@ -12,6 +14,9 @@ export default abstract class Endpoints {
 	static users = {
 		me: {
 			get: usersMeGet
+		},
+		guilds: {
+			getAll: usersGuildsGetAll
 		}
 	};
 }

@@ -37,22 +37,29 @@ const requestManager = <
 		RequestResponse<RD> | F
 	>(defaultValue);
 
-	const resPromise = writable<Promise<ApiCallRes<RD>>>();
+	const resPromise = writable<Promise<RequestResponse<RD>>>(new Promise(() => {}));
 
 	const send = async (reqData: D): Promise<ApiCallRes<RD>> => {
 		const promise = func(reqData);
-		resPromise.set(promise);
 
-		const res = await promise;
+		resPromise.set(
+			new Promise<RequestResponse<RD>>(async (resolve, reject) => {
+				const res = await promise;
+				setLoading();
+				if (isResError(res)) {
+					setError(res.error);
+					reject(res.error);
+				} else {
+					setSuccess(res.data);
+					resolve(res.data);
+				}
+			})
+		);
 
-		setLoading();
-		if (isResError(res)) setError(res.error);
-		else setSuccess(res.data);
-
-		return res;
+		return await promise;
 	};
 
-	const state = derived([reqState, resPromise], ([reqState, resPromise]) => ({
+	const store = derived([reqState, resPromise], ([reqState, resPromise]) => ({
 		promise: resPromise,
 		isLoading: reqState.isLoading,
 		error: reqState.error,
@@ -60,7 +67,7 @@ const requestManager = <
 	}));
 
 	return {
-		state,
+		store,
 		send,
 		setters: {
 			setIdle,

@@ -4,6 +4,13 @@ export default {
 	white: "rgb(255,255,255)",
 	black: "rgb(0,0,0)",
 
+	// Primary
+	red: "rgb(255, 82, 82)", // #FF5252
+	green: "rgb(30, 221, 118)", // #1EDD76
+	blue: "rgb(73, 190, 253)", // #49BEFD
+	orange: "rgb(254, 146, 51)", // #FE9233
+	yellow: "rgb(254, 183, 47)", // #FEB72F
+
 	// Black
 	"black-1": "rgb(1, 1, 6)", // #010106
 	"black-2": "rgb(5, 5, 10)", // #05050A
