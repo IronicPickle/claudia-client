@@ -3,15 +3,17 @@
 	import { openInNewTabProps } from "$constants/generic";
 	import type { Color, JustifyContent } from "$ts/generic";
 	import { alphaColor, classNames, offsetColor, styles } from "$utils/generic";
+	import storeRelativeCursorPosition from "$utils/storeRelativeCursorPosition";
+	import { type CursorCoords } from "$utils/storeRelativeCursorPosition";
+	import { createEventDispatcher } from "svelte";
+	import { writable } from "svelte/store";
 
-	type Variant = "contained" | "flat";
+	type Variant = "contained" | "outlined" | "flat";
 
 	export let fontSize: string = "24px";
 	export let variant: Variant = "contained";
 
 	export let color: Color = "blue-1";
-	export let borderColor: Color = "blue-5";
-	export let innerShadowColor: Color = "black";
 	export let textColor: Color = "white";
 	export let iconColor: Color = textColor;
 
@@ -31,69 +33,100 @@
 	const hasStartIcon = $$slots["start"];
 	const hasEndIcon = $$slots["end"];
 
-	const sharedProps:
-		| svelteHTML.HTMLAttributes<HTMLButtonElement>
-		| svelteHTML.HTMLAttributes<HTMLAnchorElement> = {
-		style: styles({
-			"--font-size": fontSize,
+	let clicked = false;
+	let clickedTimeout: any;
 
-			"--color": colors[color],
-			"--color-offset-1": offsetColor(color, 0.1),
-			"--color-offset-2": offsetColor(color, 0.25),
-			"--color-alpha": alphaColor(color, 0.1),
+	const dispatch = createEventDispatcher<{
+		click: MouseEvent;
+	}>();
 
-			"--inner-shadow-color": colors[innerShadowColor],
+	const handleClick = (event: MouseEvent) => {
+		clearTimeout(clickedTimeout);
+		clicked = true;
+		clickedTimeout = setTimeout(() => {
+			clicked = false;
+		}, 250);
 
-			"--border-color": colors[borderColor],
-			"--border-color-alpha": alphaColor(borderColor, 0.1),
-			"--text-color": colors[textColor],
-			"--icon-color": colors[iconColor],
-
-			"--justify-content": justifyContent
-		}),
-		class: classNames(
-			"button",
-			readOnly && "read-only",
-			disableHover && "hover-disabled",
-			wrap && "wrap",
-			(hasStartIcon || hasEndIcon || justifyContent !== "space-between") && "do-justify",
-			isLoading && "is-loading",
-			active && "active",
-			disabled && "disabled",
-
-			rounded && "rounded",
-
-			variant
-		),
-		disabled
+		dispatch("click", event);
 	};
+
+	const coords = writable<CursorCoords>({
+		x: 0,
+		y: 0
+	});
+	let width: number = 0;
+
+	let sharedProps:
+		| svelteHTML.HTMLAttributes<HTMLButtonElement>
+		| svelteHTML.HTMLAttributes<HTMLAnchorElement> = {};
+
+	$: {
+		sharedProps = {
+			style: styles({
+				"--font-size": fontSize,
+
+				"--color": colors[color],
+				"--color-offset-1": offsetColor(color, 0.1),
+				"--color-offset-2": offsetColor(color, 0.25),
+				"--color-alpha": alphaColor(color, 0.15),
+
+				"--text-color": colors[textColor],
+				"--icon-color": colors[iconColor],
+
+				"--justify-content": justifyContent,
+
+				"--x-offset": `${Math.floor($coords.x / (width / 100))}%`
+			}),
+			class: classNames(
+				"button",
+				readOnly && "read-only",
+				disableHover && "hover-disabled",
+				wrap && "wrap",
+				(hasStartIcon || hasEndIcon || justifyContent !== "space-between") && "do-justify",
+				isLoading && "is-loading",
+				(active || clicked) && "active",
+				disabled && "disabled",
+
+				rounded && "rounded",
+
+				variant
+			),
+			disabled
+		};
+	}
 </script>
 
 {#if !href}
-	<button {...sharedProps} on:click>
+	<button
+		{...sharedProps}
+		on:click={handleClick}
+		on:mousemove={storeRelativeCursorPosition(coords)}
+		bind:clientWidth={width}
+	>
 		<div class="inner">
 			<slot name="start" />
 			<span><slot /></span>
 			<slot name="end" />
 		</div>
 
-		<div class="shadow top" />
-		<div class="shadow right" />
-		<div class="shadow bottom" />
-		<div class="shadow left" />
+		<div class="shine" />
 	</button>
 {:else}
-	<a {...openInNewTab ? openInNewTabProps : {}} {href} {...sharedProps}>
+	<a
+		{...openInNewTab ? openInNewTabProps : {}}
+		{href}
+		{...sharedProps}
+		on:click={handleClick}
+		on:mousemove={storeRelativeCursorPosition(coords)}
+		bind:clientWidth={width}
+	>
 		<div class="inner">
 			<slot name="start" />
 			<span><slot /></span>
 			<slot name="end" />
 		</div>
 
-		<div class="shadow top" />
-		<div class="shadow right" />
-		<div class="shadow bottom" />
-		<div class="shadow left" />
+		<div class="shine" />
 	</a>
 {/if}
 
@@ -101,17 +134,14 @@
 	$fontSize: var(--font-size);
 
 	$color: var(--color);
-	$colorOffset1: var(--color-offset-1);
-	$colorOffset2: var(--color-offset-2);
 	$colorAlpha: var(--color-alpha);
 
-	$innerShadowColor: var(--inner-shadow-color);
-	$borderColor: var(--border-color);
-	$borderColorAlpha: var(--border-color-alpha);
 	$textColor: var(--text-color);
 	$iconColor: var(--icon-color);
 
 	$justifyContent: var(--justify-content);
+
+	$xOffset: var(--x-offset);
 
 	button,
 	a {
@@ -127,7 +157,9 @@
 
 		overflow: hidden;
 		cursor: pointer;
-		transition: background-color 200ms ease;
+		transition:
+			background-color 200ms ease,
+			box-shadow 300ms ease;
 
 		&:disabled,
 		&.disabled {
@@ -156,58 +188,95 @@
 			}
 		}
 
-		&.flat {
-			background-color: transparent;
+		&.contained {
+			background-color: $color;
+			box-shadow: 0 0 0 0.05em $color;
 
-			.shadow {
-				box-shadow: 0 0 0.2em 0.04em transparent;
+			.shine {
+				background-image: linear-gradient(-65deg, rgba(255, 255, 255, 0.2) 48%, transparent 52%);
 			}
 
 			&:not(.hover-disabled) {
-				&:hover {
-					background-color: $colorAlpha;
-
-					.shadow {
-						box-shadow: -0.15em -0.15em 0.5em 0.1em $innerShadowColor;
-					}
-				}
-
 				&:active,
 				&.active {
-					background-color: $colorAlpha;
-
-					.shadow {
-						box-shadow: -0.05em -0.05em 0.3em 0.06em $innerShadowColor;
-					}
+					box-shadow: 0 0 0 0.1em $color;
 				}
 			}
 		}
 
-		&.contained {
-			background-color: $color;
+		&.outlined {
+			background-color: transparent;
+			box-shadow: 0 0 0 0.05em $color;
 
-			.shadow {
-				box-shadow: -0.15em -0.15em 0.5em 0.1em $innerShadowColor;
+			.shine {
+				background-image: linear-gradient(-65deg, $colorAlpha 48%, transparent 52%);
 			}
 
 			&:not(.hover-disabled) {
 				&:hover {
-					background-color: $colorOffset1;
-
-					.shadow {
-						box-shadow: -0.15em -0.15em 0.5em 0.1em $innerShadowColor;
-					}
+					box-shadow: 0 0 0 0.05em $color;
 				}
 
 				&:active,
 				&.active {
-					background-color: $colorOffset2;
-
-					.shadow {
-						box-shadow: -0.05em -0.05em 0.3em 0.06em $innerShadowColor;
-					}
+					box-shadow: 0 0 0 0.1em $color;
 				}
 			}
+		}
+
+		&.flat {
+			background-color: transparent;
+			box-shadow: 0 0 0 0.05em transparent;
+
+			.shine {
+				background-image: linear-gradient(-65deg, $colorAlpha 45%, transparent 55%);
+			}
+
+			&:not(.hover-disabled) {
+				&:hover {
+					box-shadow: 0 0 0 0.05em $colorAlpha;
+				}
+
+				&:active,
+				&.active {
+					box-shadow: 0 0 0 0.1em $colorAlpha;
+				}
+			}
+		}
+
+		&:not(.hover-disabled) {
+			&:hover {
+				.shine {
+					background-position: calc(100% - $xOffset);
+
+					opacity: 1;
+				}
+			}
+
+			&:active,
+			&.active {
+				.shine {
+					background-position: 100% 100%;
+
+					opacity: 1;
+				}
+			}
+
+			&:not(:hover),
+			&:active {
+				.shine {
+					transition: background-position 200ms ease;
+				}
+			}
+		}
+
+		.shine {
+			position: absolute;
+			inset: 0;
+
+			background-size: 220%;
+
+			opacity: 1;
 		}
 
 		.inner {
@@ -228,50 +297,6 @@
 				&:last-child {
 					margin-left: 0.6em;
 				}
-			}
-		}
-
-		.shadow {
-			position: absolute;
-
-			font-size: inherit;
-
-			transition: box-shadow 200ms ease;
-
-			&.top {
-				left: 0;
-				top: 0;
-				right: 0;
-
-				height: 0;
-				width: 100%;
-			}
-
-			&.right {
-				top: 0;
-				right: 0;
-				bottom: 0;
-
-				height: 100%;
-				width: 0;
-			}
-
-			&.bottom {
-				right: 0;
-				bottom: 0;
-				left: 0;
-
-				height: 0;
-				width: 100%;
-			}
-
-			&.left {
-				bottom: 0;
-				left: 0;
-				top: 0;
-
-				height: 100%;
-				width: 0;
 			}
 		}
 	}

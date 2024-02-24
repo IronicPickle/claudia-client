@@ -25,8 +25,8 @@
 	<div class="wrapper">
 		<div class="left">
 			<IconButton
-				fontSize="18px"
 				variant="flat"
+				fontSize="18px"
 				color="white"
 				iconColor="white"
 				rounded

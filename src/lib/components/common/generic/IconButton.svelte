@@ -3,6 +3,10 @@
 	import { openInNewTabProps } from "$constants/generic";
 	import type { Color } from "$ts/generic";
 	import { alphaColor, classNames, offsetColor, styles } from "$utils/generic";
+	import type { CursorCoords } from "$utils/storeRelativeCursorPosition";
+	import storeRelativeCursorPosition from "$utils/storeRelativeCursorPosition";
+	import { createEventDispatcher } from "svelte";
+	import { writable } from "svelte/store";
 
 	type Variant = "contained" | "flat";
 
@@ -10,8 +14,6 @@
 	export let variant: Variant = "contained";
 
 	export let color: Color = "blue-1";
-	export let borderColor: Color = "blue-5";
-	export let innerShadowColor: Color = "black";
 	export let iconColor: Color = "white";
 
 	export let rounded: boolean = false;
@@ -24,60 +26,91 @@
 	export let href: string | undefined = undefined;
 	export let openInNewTab: boolean = false;
 
-	const sharedProps:
-		| svelteHTML.HTMLAttributes<HTMLButtonElement>
-		| svelteHTML.HTMLAttributes<HTMLAnchorElement> = {
-		style: styles({
-			"--font-size": fontSize,
+	let clicked = false;
+	let clickedTimeout: any;
 
-			"--color": colors[color],
-			"--color-offset-1": offsetColor(color, 0.1),
-			"--color-offset-2": offsetColor(color, 0.25),
-			"--color-alpha": alphaColor(color, 0.1),
+	const dispatch = createEventDispatcher<{
+		click: MouseEvent;
+	}>();
 
-			"--inner-shadow-color": colors[innerShadowColor],
+	const handleClick = (event: MouseEvent) => {
+		clearTimeout(clickedTimeout);
+		clicked = true;
+		clickedTimeout = setTimeout(() => {
+			clicked = false;
+		}, 250);
 
-			"--border-color": colors[borderColor],
-			"--border-color-alpha": alphaColor(borderColor, 0.1),
-			"--icon-color": colors[iconColor]
-		}),
-		class: classNames(
-			"button",
-			readOnly && "read-only",
-			disableHover && "hover-disabled",
-			isLoading && "is-loading",
-			active && "active",
-			disabled && "disabled",
-
-			rounded && "rounded",
-
-			variant
-		),
-		disabled
+		dispatch("click", event);
 	};
+
+	const coords = writable<CursorCoords>({
+		x: 0,
+		y: 0
+	});
+	let width: number = 0;
+
+	let sharedProps:
+		| svelteHTML.HTMLAttributes<HTMLButtonElement>
+		| svelteHTML.HTMLAttributes<HTMLAnchorElement> = {};
+
+	$: {
+		sharedProps = {
+			style: styles({
+				"--font-size": fontSize,
+
+				"--color": colors[color],
+				"--color-offset-1": offsetColor(color, 0.1),
+				"--color-offset-2": offsetColor(color, 0.25),
+				"--color-alpha": alphaColor(color, 0.1),
+
+				"--icon-color": colors[iconColor],
+
+				"--x-offset": `${Math.floor($coords.x / (width / 100))}%`
+			}),
+			class: classNames(
+				"button",
+				readOnly && "read-only",
+				disableHover && "hover-disabled",
+				isLoading && "is-loading",
+				(active || clicked) && "active",
+				disabled && "disabled",
+
+				rounded && "rounded",
+
+				variant
+			),
+			disabled
+		};
+	}
 </script>
 
 {#if !href}
-	<button {...sharedProps} on:click>
+	<button
+		{...sharedProps}
+		on:click={handleClick}
+		on:mousemove={storeRelativeCursorPosition(coords)}
+		bind:clientWidth={width}
+	>
 		<div class="inner">
 			<slot />
 		</div>
 
-		<div class="shadow top" />
-		<div class="shadow right" />
-		<div class="shadow bottom" />
-		<div class="shadow left" />
+		<div class="shine" />
 	</button>
 {:else}
-	<a {...openInNewTab ? openInNewTabProps : {}} {href} {...sharedProps}>
+	<a
+		{...openInNewTab ? openInNewTabProps : {}}
+		{href}
+		{...sharedProps}
+		on:click={handleClick}
+		on:mousemove={storeRelativeCursorPosition(coords)}
+		bind:clientWidth={width}
+	>
 		<div class="inner">
 			<slot />
 		</div>
 
-		<div class="shadow top" />
-		<div class="shadow right" />
-		<div class="shadow bottom" />
-		<div class="shadow left" />
+		<div class="shine" />
 	</a>
 {/if}
 
@@ -89,10 +122,9 @@
 	$colorOffset2: var(--color-offset-2);
 	$colorAlpha: var(--color-alpha);
 
-	$innerShadowColor: var(--inner-shadow-color);
-	$borderColor: var(--border-color);
-	$borderColorAlpha: var(--border-color-alpha);
 	$iconColor: var(--icon-color);
+
+	$xOffset: var(--x-offset);
 
 	button,
 	a {
@@ -122,58 +154,79 @@
 			border-radius: 50%;
 		}
 
+		&.contained {
+			background-color: $color;
+			box-shadow: 0 0 0 0.05em $color;
+
+			.shine {
+				background-image: linear-gradient(-65deg, rgba(255, 255, 255, 0.2) 45%, transparent 55%);
+			}
+
+			&:not(.hover-disabled) {
+				&:active,
+				&.active {
+					box-shadow: 0 0 0 0.1em $color;
+				}
+			}
+		}
+
 		&.flat {
 			background-color: transparent;
+			box-shadow: 0 0 0 0.05em transparent;
 
-			.shadow {
-				box-shadow: 0 0 0.2em 0.04em transparent;
+			.shine {
+				background-image: linear-gradient(-65deg, $colorAlpha 45%, transparent 55%);
+
+				opacity: 0;
 			}
 
 			&:not(.hover-disabled) {
 				&:hover {
-					background-color: $colorAlpha;
+					box-shadow: 0 0 0 0.05em $colorAlpha;
 
-					.shadow {
-						box-shadow: -0.15em -0.15em 0.5em 0.1em $innerShadowColor;
+					.shine {
+						opacity: 1;
 					}
 				}
 
 				&:active,
 				&.active {
-					background-color: $colorAlpha;
+					box-shadow: 0 0 0 0.1em $colorAlpha;
 
-					.shadow {
-						box-shadow: -0.05em -0.05em 0.3em 0.06em $innerShadowColor;
+					.shine {
+						opacity: 1;
 					}
 				}
 			}
 		}
 
-		&.contained {
-			background-color: $color;
-
-			.shadow {
-				box-shadow: -0.15em -0.15em 0.5em 0.1em $innerShadowColor;
-			}
-
-			&:not(.hover-disabled) {
-				&:hover {
-					background-color: $colorOffset1;
-
-					.shadow {
-						box-shadow: -0.15em -0.15em 0.5em 0.1em $innerShadowColor;
-					}
-				}
-
-				&:active,
-				&.active {
-					background-color: $colorOffset2;
-
-					.shadow {
-						box-shadow: -0.05em -0.05em 0.3em 0.06em $innerShadowColor;
-					}
+		&:not(.hover-disabled) {
+			&:hover {
+				.shine {
+					background-position: calc(100% - $xOffset);
 				}
 			}
+
+			&:active,
+			&.active {
+				.shine {
+					background-position: 100% 100%;
+				}
+			}
+
+			&:not(:hover),
+			&:active {
+				.shine {
+					transition: background-position 200ms ease;
+				}
+			}
+		}
+
+		.shine {
+			position: absolute;
+			inset: 0;
+
+			background-size: 220%;
 		}
 
 		.inner {

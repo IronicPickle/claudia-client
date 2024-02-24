@@ -32,7 +32,7 @@
 {#if _in}
 	<div
 		transition:fly={{
-			duration: 300,
+			duration: 100,
 			easing: linear,
 			x,
 			y,

@@ -25,9 +25,9 @@
 					<div class="guilds">
 						{#each data.discordGuilds as discordGuild}
 							<Button
-								variant="flat"
+								variant="outlined"
 								fontSize="20px"
-								color="blue"
+								color="blue-1"
 								textColor="white"
 								on:click={() => setSelectedDiscordGuild(discordGuild._id)}
 							>
@@ -43,7 +43,7 @@
 						<Button
 							fontSize="20px"
 							variant="flat"
-							color="white"
+							color="red"
 							textColor="red"
 							on:click={() => setSelectedDiscordGuild(null)}
 						>
