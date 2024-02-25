@@ -6,7 +6,9 @@
 	import { linear } from "svelte/easing";
 	import { fly } from "svelte/transition";
 
-	const dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher<{
+		close: undefined;
+	}>();
 
 	const handleClose = () => dispatch("close");
 
@@ -22,7 +24,7 @@
 	export let distance: string = "2%";
 	export let size: string = "300px";
 	export let color: Color = "black-2";
-	export let borderColor: Color = "black-3";
+	export let borderColor: Color = "black-4";
 
 	const actualDistance = ["left", "top"].includes(side) ? `-${distance}` : distance;
 	const x = ["left", "right"].includes(side) ? actualDistance : undefined;

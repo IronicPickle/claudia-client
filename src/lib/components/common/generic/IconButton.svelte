@@ -10,6 +10,11 @@
 
 	type Variant = "contained" | "flat";
 
+	let clazz: string | undefined = undefined;
+	let id: string | undefined = undefined;
+	let style: string | undefined = undefined;
+	export { clazz as class, id, style };
+
 	export let fontSize: string = "24px";
 	export let variant: Variant = "contained";
 
@@ -55,7 +60,7 @@
 
 	$: {
 		sharedProps = {
-			style: styles({
+			style: `${styles({
 				"--font-size": fontSize,
 
 				"--color": colors[color],
@@ -66,7 +71,7 @@
 				"--icon-color": colors[iconColor],
 
 				"--x-offset": `${Math.floor($coords.x / (width / 100))}%`
-			}),
+			})} ${style}`,
 			class: classNames(
 				"button",
 				readOnly && "read-only",
@@ -77,9 +82,12 @@
 
 				rounded && "rounded",
 
-				variant
+				variant,
+
+				clazz
 			),
-			disabled
+			disabled,
+			id
 		};
 	}
 </script>

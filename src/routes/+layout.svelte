@@ -4,8 +4,8 @@
 </script>
 
 <div class="root">
-	<NavDrawer />
 	<div class="viewport-wrapper">
+		<NavDrawer />
 		<div class="page-wrapper">
 			<Header />
 			<slot />

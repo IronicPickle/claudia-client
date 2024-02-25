@@ -23,7 +23,7 @@
 
 <header>
 	<div class="wrapper">
-		<div class="left">
+		<div class="controls">
 			<IconButton
 				variant="flat"
 				fontSize="18px"
@@ -34,23 +34,26 @@
 			>
 				<IonMenu />
 			</IconButton>
-			<h1><Logo /> Claudia</h1>
 		</div>
 
 		<div class="user-details">
 			<div class="text-wrapper">
 				<h2>{$meStore.data?.discordUser.username}</h2>
 			</div>
-			<Avatar src={$avatarUrl} alt="Discord avatar" size={64} />
+			<Avatar src={$avatarUrl} alt="Discord avatar" size={48} />
 		</div>
 	</div>
 </header>
 
 <style lang="scss">
 	header {
-		padding: 16px 32px;
+		height: 80px;
+
+		padding: 12px 16px;
 
 		background-color: $black-3;
+
+		box-sizing: border-box;
 
 		.wrapper {
 			display: flex;
@@ -58,25 +61,12 @@
 			justify-content: space-between;
 
 			width: 100%;
+			height: 100%;
 
-			.left {
+			.controls {
 				display: flex;
 				align-items: center;
-				gap: 12px;
-				h1 {
-					display: inline-flex;
-					align-items: center;
-					gap: 8px;
-
-					@include quantico(400);
-					font-size: 32px;
-					color: $white;
-
-					:global(svg) {
-						@include size(48px);
-						color: $white;
-					}
-				}
+				gap: 16px;
 			}
 
 			.user-details {
