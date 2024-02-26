@@ -31,11 +31,17 @@
 	export let href: string | undefined = undefined;
 	export let openInNewTab: boolean = false;
 
+	export let type: "button" | "submit" | "reset" = "button";
+	export let name: string | undefined = undefined;
+
+	let element: HTMLButtonElement | HTMLAnchorElement | undefined = undefined;
+
 	let clicked = false;
 	let clickedTimeout: any;
 
 	const dispatch = createEventDispatcher<{
 		click: MouseEvent;
+		blur: FocusEvent;
 	}>();
 
 	const handleClick = (event: MouseEvent) => {
@@ -48,56 +54,64 @@
 		dispatch("click", event);
 	};
 
+	const handleBlur = (event: FocusEvent) => dispatch("blur", event);
+
 	const coords = writable<CursorCoords>({
 		x: 0,
 		y: 0
 	});
 	let width: number = 0;
 
-	let sharedProps:
-		| svelteHTML.HTMLAttributes<HTMLButtonElement>
-		| svelteHTML.HTMLAttributes<HTMLAnchorElement> = {};
+	let sharedStyle = "";
+	let sharedClass = "";
 
 	$: {
-		sharedProps = {
-			style: `${styles({
-				"--font-size": fontSize,
+		sharedStyle = `${styles({
+			"--font-size": fontSize,
 
-				"--color": colors[color],
-				"--color-offset-1": offsetColor(color, 0.1),
-				"--color-offset-2": offsetColor(color, 0.25),
-				"--color-alpha": alphaColor(color, 0.1),
+			"--color": colors[color],
+			"--color-offset-1": offsetColor(color, 0.1),
+			"--color-offset-2": offsetColor(color, 0.25),
+			"--color-alpha": alphaColor(color, 0.1),
 
-				"--icon-color": colors[iconColor],
+			"--icon-color": colors[iconColor],
 
-				"--x-offset": `${Math.floor($coords.x / (width / 100))}%`
-			})} ${style}`,
-			class: classNames(
-				"button",
-				readOnly && "read-only",
-				disableHover && "hover-disabled",
-				isLoading && "is-loading",
-				(active || clicked) && "active",
-				disabled && "disabled",
+			"--x-offset": `${Math.floor($coords.x / (width / 100))}%`
+		})} ${style}`;
+	}
 
-				rounded && "rounded",
+	$: {
+		sharedClass = classNames(
+			"button",
+			readOnly && "read-only",
+			disableHover && "hover-disabled",
+			isLoading && "is-loading",
+			(active || clicked) && "active",
+			disabled && "disabled",
 
-				variant,
+			rounded && "rounded",
 
-				clazz
-			),
-			disabled,
-			id
-		};
+			variant,
+
+			clazz
+		);
 	}
 </script>
 
 {#if !href}
 	<button
-		{...sharedProps}
+		style={sharedStyle}
+		class={sharedClass}
+		{disabled}
+		{id}
+		{name}
+		{type}
+		tabIndex={0}
 		on:click={handleClick}
+		on:blur={handleBlur}
 		on:mousemove={storeRelativeCursorPosition(coords)}
 		bind:clientWidth={width}
+		bind:this={element}
 	>
 		<div class="inner">
 			<slot />
@@ -107,12 +121,17 @@
 	</button>
 {:else}
 	<a
+		style={sharedStyle}
+		class={sharedClass}
 		{...openInNewTab ? openInNewTabProps : {}}
 		{href}
-		{...sharedProps}
+		{id}
+		{type}
+		tabIndex={0}
 		on:click={handleClick}
 		on:mousemove={storeRelativeCursorPosition(coords)}
 		bind:clientWidth={width}
+		bind:this={element}
 	>
 		<div class="inner">
 			<slot />

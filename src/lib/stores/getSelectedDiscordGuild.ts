@@ -1,14 +1,14 @@
 import storageItem from "$utils/storageItem";
 import { get, writable } from "svelte/store";
 import getDiscordGuilds from "./getDiscordGuilds";
-import type { DbDiscordGuild } from "$shared/lib/api/server/internal/discord/dbSpec";
+import type { DbDiscordGuild, WithDbId } from "$shared/lib/api/server/internal/discord/dbSpec";
 
 const discordGuilds = getDiscordGuilds();
 
 export default () => {
 	const { item, set, remove } = storageItem<string>("selected-discord-guild-id");
 
-	const selectedDiscordGuild = writable<DbDiscordGuild | null>(null);
+	const selectedDiscordGuild = writable<WithDbId<DbDiscordGuild> | null>(null);
 
 	discordGuilds.store.subscribe(({ data }) => {
 		const guild = data?.discordGuilds.find(({ _id }) => _id === get(item).data);

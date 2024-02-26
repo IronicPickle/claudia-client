@@ -4,15 +4,20 @@
 	import { generateDiscordAvatarUrl } from "$utils/generic";
 	import { derived } from "svelte/store";
 	import Avatar from "$components/common/generic/Avatar.svelte";
-	import Button from "$components/common/generic/Button.svelte";
 	import getNavDrawerIn from "$stores/getNavDrawerIn";
 	import IconButton from "$components/common/generic/IconButton.svelte";
 
-	import Logo from "$components/media/Logo.svelte";
 	import IonMenu from "~icons/ion/menu";
+	import Select from "$components/common/form/Select.svelte";
+	import getSelectedDiscordGuild from "$stores/getSelectedDiscordGuild";
+	import getDiscordGuilds from "$stores/getDiscordGuilds";
+
+	const { store: discordGuildsStore } = getDiscordGuilds();
 
 	const { store: meStore } = getMe();
 	const { set: setNavDrawerIn } = getNavDrawerIn();
+	const { store: selectedDiscordGuildStore, set: setSelectedDiscordGuild } =
+		getSelectedDiscordGuild();
 
 	let avatarUrl = derived(meStore, ({ data }) =>
 		data?.discordUser.avatar
@@ -34,6 +39,25 @@
 			>
 				<IonMenu />
 			</IconButton>
+
+			<Select
+				variant="outlined"
+				fontSize="16px"
+				color="blue-2"
+				optionsColor="blue-2"
+				optionsTextColor="white"
+				value={$selectedDiscordGuildStore?._id}
+				on:change={({ detail: { value } }) => setSelectedDiscordGuild(value)}
+				useEmptyOption
+				emptyOptionProps={{
+					label: "Select a server"
+				}}
+				options={$discordGuildsStore.data?.discordGuilds.map((guild) => ({
+					value: guild._id,
+					label: guild.name
+				})) ?? []}
+				isLoading={$discordGuildsStore.isLoading}
+			/>
 		</div>
 
 		<div class="user-details">

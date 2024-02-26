@@ -6,6 +6,7 @@
 	import storeRelativeCursorPosition from "$utils/storeRelativeCursorPosition";
 	import { type CursorCoords } from "$utils/storeRelativeCursorPosition";
 	import { createEventDispatcher } from "svelte";
+	import { Circle2, DoubleBounce, Jumper, Moon, Shadow, Wave } from "svelte-loading-spinners";
 	import { writable } from "svelte/store";
 
 	type Variant = "contained" | "outlined" | "flat";
@@ -35,6 +36,11 @@
 	export let href: string | undefined = undefined;
 	export let openInNewTab: boolean = false;
 
+	export let type: "button" | "submit" | "reset" = "button";
+	export let name: string | undefined = undefined;
+
+	let element: HTMLButtonElement | HTMLAnchorElement | undefined = undefined;
+
 	const hasStartIcon = $$slots["start"];
 	const hasEndIcon = $$slots["end"];
 
@@ -43,6 +49,7 @@
 
 	const dispatch = createEventDispatcher<{
 		click: MouseEvent;
+		blur: FocusEvent;
 	}>();
 
 	const handleClick = (event: MouseEvent) => {
@@ -55,78 +62,98 @@
 		dispatch("click", event);
 	};
 
+	const handleBlur = (event: FocusEvent) => dispatch("blur", event);
+
 	const coords = writable<CursorCoords>({
 		x: 0,
 		y: 0
 	});
 	let width: number = 0;
 
-	let sharedProps:
-		| svelteHTML.HTMLAttributes<HTMLButtonElement>
-		| svelteHTML.HTMLAttributes<HTMLAnchorElement> = {};
+	let sharedStyle = "";
+	let sharedClass = "";
 
 	$: {
-		sharedProps = {
-			style: `${styles({
-				"--font-size": fontSize,
+		let xOffset = Math.floor($coords.x / (width / 100));
+		xOffset /= 2;
+		xOffset += 25;
+		sharedStyle = `${styles({
+			"--font-size": fontSize,
 
-				"--color": colors[color],
-				"--color-offset-1": offsetColor(color, 0.1),
-				"--color-offset-2": offsetColor(color, 0.25),
-				"--color-alpha": alphaColor(color, 0.15),
+			"--color": colors[color],
+			"--color-offset-1": offsetColor(color, 0.1),
+			"--color-offset-2": offsetColor(color, 0.25),
+			"--color-alpha": alphaColor(color, 0.15),
 
-				"--text-color": colors[textColor],
-				"--icon-color": colors[iconColor],
+			"--text-color": colors[textColor],
+			"--icon-color": colors[iconColor],
 
-				"--justify-content": justifyContent,
+			"--justify-content": justifyContent,
 
-				"--x-offset": `${Math.floor($coords.x / (width / 100))}%`
-			})} ${style}`,
-			class: classNames(
-				"button",
-				readOnly && "read-only",
-				disableHover && "hover-disabled",
-				wrap && "wrap",
-				(hasStartIcon || hasEndIcon || justifyContent !== "space-between") && "do-justify",
-				isLoading && "is-loading",
-				(active || clicked) && "active",
-				disabled && "disabled",
+			"--x-offset": `${xOffset}%`
+		})} ${style}`;
+	}
 
-				rounded && "rounded",
+	$: {
+		sharedClass = classNames(
+			"button",
+			readOnly && "read-only",
+			disableHover && "hover-disabled",
+			wrap && "wrap",
+			(hasStartIcon || hasEndIcon || justifyContent !== "space-between") && "do-justify",
+			isLoading && "is-loading",
+			(active || clicked) && "active",
+			disabled && "disabled",
 
-				variant,
+			rounded && "rounded",
 
-				clazz
-			),
-			disabled,
-			id
-		};
+			variant,
+
+			clazz
+		);
 	}
 </script>
 
 {#if !href}
 	<button
-		{...sharedProps}
+		style={sharedStyle}
+		class={sharedClass}
+		{disabled}
+		{id}
+		{name}
+		{type}
+		tabIndex={0}
 		on:click={handleClick}
+		on:blur={handleBlur}
 		on:mousemove={storeRelativeCursorPosition(coords)}
 		bind:clientWidth={width}
+		bind:this={element}
 	>
 		<div class="inner">
 			<slot name="start" />
 			<span><slot /></span>
-			<slot name="end" />
+			{#if isLoading}
+				<Moon color={colors[iconColor]} size={parseInt(fontSize)} />
+			{:else}
+				<slot name="end" />
+			{/if}
 		</div>
 
 		<div class="shine" />
 	</button>
 {:else}
 	<a
+		style={sharedStyle}
+		class={sharedClass}
 		{...openInNewTab ? openInNewTabProps : {}}
 		{href}
-		{...sharedProps}
+		{id}
+		{type}
+		tabIndex={0}
 		on:click={handleClick}
 		on:mousemove={storeRelativeCursorPosition(coords)}
 		bind:clientWidth={width}
+		bind:this={element}
 	>
 		<div class="inner">
 			<slot name="start" />
@@ -163,7 +190,6 @@
 		color: $textColor;
 		text-transform: uppercase;
 
-		overflow: hidden;
 		cursor: pointer;
 		transition:
 			background-color 200ms ease,
@@ -179,7 +205,7 @@
 		}
 
 		&.rounded {
-			border-radius: 50%;
+			border-radius: 50em;
 		}
 
 		&:not(.wrap) {
@@ -280,9 +306,12 @@
 
 		.shine {
 			position: absolute;
+
 			inset: 0;
 
-			background-size: 220%;
+			border-radius: 0.4em;
+
+			background-size: 300%;
 
 			opacity: 1;
 		}
@@ -294,9 +323,11 @@
 			padding: 0.6em 1em;
 
 			:global(> *:not(span):not(.not-icon)) {
-				@include size(1.2em);
-
 				color: $iconColor;
+
+				&:not(.wrapper) {
+					@include size(1.2em);
+				}
 
 				&:first-child {
 					margin-right: 0.6em;

@@ -52,6 +52,9 @@ const config = {
 			$config: "./src/config/",
 			$api: "./src/api/"
 		}
+	},
+	compilerOptions: {
+		accessors: true
 	}
 };
 

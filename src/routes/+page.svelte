@@ -1,61 +1,10 @@
 <script lang="ts">
-	import Button from "$components/common/generic/Button.svelte";
-	import Error from "$components/common/generic/Error.svelte";
-	import Loading from "$components/common/generic/Loading.svelte";
 	import Pane from "$components/common/generic/Pane.svelte";
-	import getDiscordGuilds from "$stores/getDiscordGuilds";
-	import getSelectedDiscordGuild from "$stores/getSelectedDiscordGuild";
-	import IoArrowForward from "~icons/ion/arrow-forward";
-	import IoClose from "~icons/ion/close";
-
-	const { store: discordGuildsStore } = getDiscordGuilds();
-
-	const { store: selectedDiscordGuildStore, set: setSelectedDiscordGuild } =
-		getSelectedDiscordGuild();
 </script>
 
 <main>
 	<Pane>
-		<div class="pane-inner">
-			{#await $discordGuildsStore.promise}
-				<Loading />
-			{:then data}
-				{#if !$selectedDiscordGuildStore}
-					<h1>Your Servers</h1>
-					<div class="guilds">
-						{#each data.discordGuilds as discordGuild}
-							<Button
-								variant="outlined"
-								fontSize="20px"
-								color="blue-1"
-								textColor="white"
-								on:click={() => setSelectedDiscordGuild(discordGuild._id)}
-							>
-								<IoArrowForward slot="end" />
-								{discordGuild.name}
-							</Button>
-						{/each}
-					</div>
-				{:else}
-					<h1>Selected Server</h1>
-					<div class="selected-guild">
-						<p>{$selectedDiscordGuildStore.name}</p>
-						<Button
-							fontSize="20px"
-							variant="flat"
-							color="red"
-							textColor="red"
-							on:click={() => setSelectedDiscordGuild(null)}
-						>
-							<IoClose slot="end" />
-							Unselect</Button
-						>
-					</div>
-				{/if}
-			{:catch error}
-				<Error>{error.error}</Error>
-			{/await}
-		</div>
+		<div class="pane-inner"></div>
 	</Pane>
 </main>
 

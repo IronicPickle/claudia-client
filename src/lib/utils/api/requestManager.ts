@@ -44,8 +44,8 @@ const requestManager = <
 
 		resPromise.set(
 			new Promise<RequestResponse<RD>>(async (resolve, reject) => {
-				const res = await promise;
 				setLoading();
+				const res = await promise;
 				if (isResError(res)) {
 					setError(res.error);
 					reject(res.error);

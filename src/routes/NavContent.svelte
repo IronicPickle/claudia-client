@@ -1,6 +1,7 @@
 <script lang="ts">
 	import IconButton from "$components/common/generic/IconButton.svelte";
 	import Logo from "$components/media/Logo.svelte";
+	import getSelectedDiscordGuild from "$stores/getSelectedDiscordGuild";
 	import { classNames } from "$utils/generic";
 	import { createEventDispatcher } from "svelte";
 
@@ -13,6 +14,8 @@
 		collapse: undefined;
 	}>();
 
+	const { store: selectedDiscordGuildStore } = getSelectedDiscordGuild();
+
 	const handleExpand = () => dispatch("expand");
 	const handleCollapse = () => dispatch("collapse");
 </script>
@@ -23,7 +26,9 @@
 		<h1>Claudia</h1>
 	</div>
 	<div class="sub-header">
-		<h2>Navigation</h2>
+		<h2>
+			{$selectedDiscordGuildStore?.name ?? "No server selected"}
+		</h2>
 		{#if expanded !== undefined}
 			<IconButton
 				class="expand-button"
@@ -145,6 +150,12 @@
 				color: $white;
 
 				overflow: hidden;
+
+				@include textOverflow;
+			}
+
+			:global(button) {
+				flex-shrink: 0;
 			}
 		}
 	}

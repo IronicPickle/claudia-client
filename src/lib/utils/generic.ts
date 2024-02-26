@@ -56,3 +56,14 @@ export const generateDiscordAvatarUrl = (
 	size: DiscordAvatarSize = 80,
 	format: DiscordAvatarType = "png"
 ) => `https://cdn.discordapp.com/avatars/${userId}/${avatarhash}.${format}?size=${size}`;
+
+export const preventAndStop = (event: Event) => {
+	event.preventDefault();
+	event.stopPropagation();
+	return event;
+};
+
+export const stopPropagation = (event: Event) => {
+	event.stopPropagation();
+	return event;
+};
