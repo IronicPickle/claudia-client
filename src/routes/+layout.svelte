@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Header from "$components/layout/Header.svelte";
-	import NavDrawer from "./NavDrawer.svelte";
+	import NavDrawer from "../lib/components/layout/NavDrawer.svelte";
 </script>
 
 <div class="root">

@@ -1,18 +1,21 @@
 <script lang="ts">
 	import IconButton from "$components/common/generic/IconButton.svelte";
 	import Logo from "$components/media/Logo.svelte";
+	import getBreakpoints from "$stores/getBreakpoints";
 	import getSelectedDiscordGuild from "$stores/getSelectedDiscordGuild";
 	import { classNames } from "$utils/generic";
 	import { createEventDispatcher } from "svelte";
 
 	import TbArrowBarToLeft from "~icons/tabler/arrow-bar-to-left";
 
-	export let expanded: boolean | undefined = undefined;
+	export let expanded: boolean | undefined = true;
 
 	const dispatch = createEventDispatcher<{
 		expand: undefined;
 		collapse: undefined;
 	}>();
+
+	const breakpoints = getBreakpoints();
 
 	const { store: selectedDiscordGuildStore } = getSelectedDiscordGuild();
 
@@ -29,7 +32,7 @@
 		<h2>
 			{$selectedDiscordGuildStore?.name ?? "No server selected"}
 		</h2>
-		{#if expanded !== undefined}
+		{#if !$breakpoints.md}
 			<IconButton
 				class="expand-button"
 				variant="flat"
@@ -61,6 +64,10 @@
 
 		&.expanded {
 			width: 280px;
+
+			@include maxScreen($md) {
+				width: 100%;
+			}
 		}
 
 		&:not(.expanded) {

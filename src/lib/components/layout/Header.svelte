@@ -11,6 +11,9 @@
 	import Select from "$components/common/form/Select.svelte";
 	import getSelectedDiscordGuild from "$stores/getSelectedDiscordGuild";
 	import getDiscordGuilds from "$stores/getDiscordGuilds";
+	import getBreakpoints from "$stores/getBreakpoints";
+
+	const breakpoints = getBreakpoints();
 
 	const { store: discordGuildsStore } = getDiscordGuilds();
 
@@ -29,16 +32,18 @@
 <header>
 	<div class="wrapper">
 		<div class="controls">
-			<IconButton
-				variant="flat"
-				fontSize="18px"
-				color="white"
-				iconColor="white"
-				rounded
-				on:click={() => setNavDrawerIn(true)}
-			>
-				<IonMenu />
-			</IconButton>
+			{#if $breakpoints.md}
+				<IconButton
+					variant="flat"
+					fontSize="18px"
+					color="white"
+					iconColor="white"
+					rounded
+					on:click={() => setNavDrawerIn(true)}
+				>
+					<IonMenu />
+				</IconButton>
+			{/if}
 
 			<Select
 				variant="outlined"
@@ -60,12 +65,14 @@
 			/>
 		</div>
 
-		<div class="user-details">
-			<div class="text-wrapper">
-				<h2>{$meStore.data?.discordUser.username}</h2>
+		{#if !$breakpoints.md}
+			<div class="user-details">
+				<div class="text-wrapper">
+					<h2>{$meStore.data?.discordUser.username}</h2>
+				</div>
+				<Avatar src={$avatarUrl} alt="Discord avatar" size={48} />
 			</div>
-			<Avatar src={$avatarUrl} alt="Discord avatar" size={48} />
-		</div>
+		{/if}
 	</div>
 </header>
 

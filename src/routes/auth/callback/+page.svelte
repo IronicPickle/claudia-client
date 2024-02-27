@@ -8,6 +8,7 @@
 	import { goto } from "$app/navigation";
 
 	import getMe from "$stores/getMe";
+	import getDiscordGuilds from "$stores/getDiscordGuilds";
 
 	const urlParams = new URLSearchParams(window.location.search);
 	const code = urlParams.get("code");
@@ -16,6 +17,7 @@
 	const { set: setSessionItem } = storageItem<ApiTokens>("session");
 
 	const me = getMe();
+	const discordGuilds = getDiscordGuilds();
 
 	onMount(async () => {
 		if (code && state) {
@@ -36,6 +38,13 @@
 					user: res.data.user,
 					discordUser: res.data.discordUser
 				});
+
+				const discordGuildsRes = await discordGuilds.send({
+					params: {
+						userId: res.data.discordUser.userId
+					}
+				});
+				if (isResError(discordGuildsRes)) return pushError(discordGuildsRes.error);
 
 				goto("/");
 			}
