@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { page } from "$app/stores";
+	import Button from "$components/common/generic/Button.svelte";
 	import IconButton from "$components/common/generic/IconButton.svelte";
 	import Logo from "$components/media/Logo.svelte";
+	import navOptions from "$constants/navOptions";
 	import getBreakpoints from "$stores/getBreakpoints";
 	import getSelectedDiscordGuild from "$stores/getSelectedDiscordGuild";
 	import { classNames } from "$utils/generic";
@@ -24,10 +27,10 @@
 </script>
 
 <div class={classNames("nav-content", expanded && "expanded")}>
-	<div class="header">
+	<a class="header" href="/">
 		<Logo />
 		<h1>Claudia</h1>
-	</div>
+	</a>
 	<div class="sub-header">
 		<h2>
 			{$selectedDiscordGuildStore?.name ?? "No server selected"}
@@ -45,6 +48,23 @@
 				<TbArrowBarToLeft />
 			</IconButton>
 		{/if}
+	</div>
+
+	<div class="nav-options">
+		{#each navOptions as { label, Icon, ...buttonProps }}
+			<Button
+				fontSize="16px"
+				variant="flat"
+				color="blue-4"
+				active={$page.route.id?.startsWith(buttonProps.href ?? "")}
+				{...buttonProps}
+			>
+				{label}
+				<svelte:fragment slot="end">
+					<svelte:component this={Icon} />
+				</svelte:fragment>
+			</Button>
+		{/each}
 	</div>
 </div>
 
@@ -97,6 +117,20 @@
 
 				h2 {
 					width: 0;
+				}
+			}
+
+			.nav-options {
+				:global(.button .inner) {
+					padding: 0.6em;
+
+					:global(:not(span)) {
+						margin: 0;
+					}
+
+					:global(span) {
+						width: 0;
+					}
 				}
 			}
 		}
@@ -164,6 +198,18 @@
 			:global(button) {
 				flex-shrink: 0;
 			}
+		}
+
+		.nav-options {
+			display: flex;
+			flex-direction: column;
+
+			width: 100%;
+
+			margin-top: 8px;
+			padding: 0 16px;
+
+			box-sizing: border-box;
 		}
 	}
 </style>
