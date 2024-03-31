@@ -1,4 +1,5 @@
 import colors from "$constants/colors";
+import type { ComponentProps, SvelteComponent } from "svelte";
 
 export type Color = keyof typeof colors;
 
@@ -29,4 +30,10 @@ export type Option = {
 export interface ChangeData<N, V> {
 	name?: N;
 	value: V;
+}
+
+export interface ComponentSpawn<C extends SvelteComponent = any> {
+	Component: C;
+	props?: ComponentProps<C>;
+	content?: any;
 }

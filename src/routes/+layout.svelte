@@ -1,6 +1,13 @@
 <script lang="ts">
 	import Header from "$components/layout/Header.svelte";
 	import NavDrawer from "../lib/components/layout/NavDrawer.svelte";
+
+	import dayjs from "dayjs";
+	import advancedFormat from "dayjs/plugin/advancedFormat";
+	import customParseFormat from "dayjs/plugin/customParseFormat";
+
+	dayjs.extend(advancedFormat);
+	dayjs.extend(customParseFormat);
 </script>
 
 <div class="root">

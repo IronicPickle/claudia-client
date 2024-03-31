@@ -6,7 +6,7 @@
 	import storeRelativeCursorPosition from "$utils/storeRelativeCursorPosition";
 	import { type CursorCoords } from "$utils/storeRelativeCursorPosition";
 	import { createEventDispatcher } from "svelte";
-	import { Circle2, DoubleBounce, Jumper, Moon, Shadow, Wave } from "svelte-loading-spinners";
+	import { Moon } from "svelte-loading-spinners";
 	import { writable } from "svelte/store";
 
 	type Variant = "contained" | "outlined" | "flat";
