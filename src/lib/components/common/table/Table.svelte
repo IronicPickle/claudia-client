@@ -14,13 +14,14 @@
 	> {
 		key: RK;
 		cells: TableCells<K>;
-		dropdownContent?: ComponentSpawn<DC>;
-		actions?: ComponentSpawn<DC> | ComponentSpawn<DC>[];
+		dropdownContent?: ComponentSpawnOptions<DC>;
+		actions?: ComponentSpawnOptions<DC> | ComponentSpawnOptions<DC>[];
 	}
 
 	export type CellValueComponent<C extends SvelteComponent = any> = {
 		value?: any;
-	} & ComponentSpawn<C>;
+		width?: string | number;
+	} & ComponentSpawnOptions<C>;
 
 	export type CellValue<C extends SvelteComponent = any> =
 		| string
@@ -42,13 +43,13 @@
 	generics="K extends string | number | symbol, RK extends string | number | symbol"
 >
 	import { linear } from "svelte/easing";
-	import { fly, slide } from "svelte/transition";
+	import { slide } from "svelte/transition";
 	import { isEmpty } from "$shared/lib/constants/generic";
 	import Button from "../generic/Button.svelte";
 	import colors from "$constants/colors";
 	import { SortDirection } from "$shared/lib/enums/generic";
-	import { SvelteComponent, createEventDispatcher, type ComponentProps } from "svelte";
-	import type { Color, ComponentSpawn } from "$ts/generic";
+	import { SvelteComponent, createEventDispatcher } from "svelte";
+	import type { Color, ComponentSpawnOptions } from "$ts/generic";
 	import { classNames, offsetColor, stopPropagation, styles } from "$utils/generic";
 	import Loading from "../generic/Loading.svelte";
 	import Error from "../generic/Error.svelte";
@@ -56,6 +57,7 @@
 
 	import IoArrowUp from "~icons/ion/arrow-up";
 	import IoArrowDown from "~icons/ion/arrow-down";
+	import ComponentSpawn from "../generic/ComponentSpawn.svelte";
 
 	export let color: Color = "black-3";
 	export let textColor: Color = "white";
@@ -147,7 +149,9 @@
 			{#if rowsHaveActions}
 				<th>
 					<div>
-						<Button color={headerColor} textColor={headerTextColor} disableHover>&nbsp;</Button>
+						<Button fontSize="16px" color={headerColor} textColor={headerTextColor} disableHover
+							>&nbsp;</Button
+						>
 					</div>
 				</th>
 			{/if}
@@ -190,15 +194,15 @@
 				>
 					{#each columns as { key }}
 						{@const cell = cells[key]}
-						<td>
-							{#if isCellComponent(cell)}
-								<svelte:component this={cell.Component} {...cell.props}>
-									{cell.content}
-								</svelte:component>
-							{:else}
+						{#if isCellComponent(cell)}
+							<td width={cell.width}>
+								<ComponentSpawn options={cell} />
+							</td>
+						{:else}
+							<td>
 								{cell}
-							{/if}
-						</td>
+							</td>
+						{/if}
 					{/each}
 					{#if rowsHaveActions}
 						<td class="actions-cell">
@@ -206,9 +210,7 @@
 								<div on:click={stopPropagation} role="none">
 									{#if actions}
 										{#each Array.isArray(actions) ? actions : [actions] as action}
-											<svelte:component this={action.Component} {...action.props}>
-												{action.content}
-											</svelte:component>
+											<ComponentSpawn options={action} />
 										{/each}
 									{/if}
 								</div>
@@ -227,9 +229,7 @@
 									}}
 								>
 									<div class="dropdown-content">
-										<svelte:component this={dropdownContent.Component} {...dropdownContent.props}>
-											{dropdownContent.content}
-										</svelte:component>
+										<ComponentSpawn options={dropdownContent} />
 									</div>
 								</div>
 							{/if}
@@ -335,6 +335,8 @@
 					@include inter(500);
 					font-size: 14px;
 					color: $white;
+
+					box-sizing: border-box;
 
 					&.actions-cell {
 						opacity: 0;

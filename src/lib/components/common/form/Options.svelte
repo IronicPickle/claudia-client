@@ -6,6 +6,7 @@
 	import Button from "../generic/Button.svelte";
 	import { fade } from "svelte/transition";
 	import { linear } from "svelte/easing";
+	import ComponentSpawn from "../generic/ComponentSpawn.svelte";
 
 	let clazz: string | undefined = undefined;
 	let id: string | undefined = undefined;
@@ -81,9 +82,17 @@
 					class="option"
 					on:click={() => handleSelect({ name: name ?? "", value: option })}
 				>
-					<svelte:component this={option.startIcon} slot="start" />
+					<svelte:fragment slot="start">
+						{#if option.startIcon}
+							<ComponentSpawn options={option.startIcon} />
+						{/if}
+					</svelte:fragment>
 					{option.label}
-					<svelte:component this={option.endIcon} slot="end" />
+					<svelte:fragment slot="end">
+						{#if option.endIcon}
+							<ComponentSpawn options={option.endIcon} />
+						{/if}
+					</svelte:fragment>
 				</Button>
 			{/each}
 		</div>
@@ -99,9 +108,17 @@
 	<div class="options-inner">
 		{#each options as option}
 			<Button {fontSize} class="option">
-				<svelte:component this={option.startIcon} slot="start" />
+				<svelte:fragment slot="start">
+					{#if option.startIcon}
+						<ComponentSpawn options={option.startIcon} />
+					{/if}
+				</svelte:fragment>
 				{option.label}
-				<svelte:component this={option.endIcon} slot="end" />
+				<svelte:fragment slot="end">
+					{#if option.endIcon}
+						<ComponentSpawn options={option.endIcon} />
+					{/if}
+				</svelte:fragment>
 			</Button>
 		{/each}
 	</div>

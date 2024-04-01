@@ -9,6 +9,12 @@
 	import dayjs from "dayjs";
 	import { derived, readable } from "svelte/store";
 	import MembersTableDropdownContent from "./MembersTableDropdownContent.svelte";
+	import IconButton from "$components/common/generic/IconButton.svelte";
+
+	import IoTrash from "~icons/ion/trash";
+	import type { ComponentSpawnOptions } from "$ts/generic";
+	import Button from "$components/common/generic/Button.svelte";
+	import type { ComponentProps } from "svelte";
 
 	const { store: guildMembersStore, ...guildMembers } =
 		Endpoints.users.guilds.members.getAll.manager(undefined);
@@ -71,12 +77,26 @@
 							src: guildMember.user?.avatar
 								? generateDiscordAvatarUrl(guildMember.user?.userId, guildMember.user?.avatar)
 								: "",
-							alt: guildMember.user?.username
-						}
+							alt: guildMember.user?.username,
+							size: 64
+						},
+						width: 18 * 2 + 64
 					},
 					nick: guildMember.nick ?? "",
 					username: guildMember.user?.username,
 					joinedAt: dayjs(guildMember.joinedAt).format("HH:mm Do MMM YYYY")
+				},
+				actions: {
+					Component: Button,
+					props: {
+						fontSize: "14px"
+					},
+					content: "test",
+					slots: {
+						start: {
+							Component: IoTrash
+						}
+					}
 				}
 			}));
 		})
