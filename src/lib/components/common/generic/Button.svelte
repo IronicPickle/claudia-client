@@ -68,12 +68,12 @@
 		x: 0,
 		y: 0
 	});
-	let width: number = 0;
 
 	let sharedStyle = "";
 	let sharedClass = "";
 
 	$: {
+		const width = element?.clientWidth ?? 0;
 		let xOffset = Math.floor($coords.x / (width / 100));
 		xOffset /= 2;
 		xOffset += 25;
@@ -126,7 +126,6 @@
 		on:click={handleClick}
 		on:blur={handleBlur}
 		on:mousemove={storeRelativeCursorPosition(coords)}
-		bind:clientWidth={width}
 		bind:this={element}
 	>
 		<div class="inner">
@@ -152,7 +151,6 @@
 		tabIndex={0}
 		on:click={handleClick}
 		on:mousemove={storeRelativeCursorPosition(coords)}
-		bind:clientWidth={width}
 		bind:this={element}
 	>
 		<div class="inner">
@@ -206,6 +204,10 @@
 
 		&.rounded {
 			border-radius: 50em;
+
+			.shine {
+				border-radius: 50em;
+			}
 		}
 
 		&:not(.wrap) {

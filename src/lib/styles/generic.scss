@@ -18,7 +18,7 @@
 	@include inter(600);
 	cursor: pointer;
 
-	&.disabled {
+	:global(&.disabled) {
 		@include disabled;
 	}
 }

@@ -8,7 +8,7 @@
 	import { createEventDispatcher } from "svelte";
 	import { writable } from "svelte/store";
 
-	type Variant = "contained" | "flat";
+	type Variant = "contained" | "outlined" | "flat";
 
 	let clazz: string | undefined = undefined;
 	let id: string | undefined = undefined;
@@ -60,12 +60,15 @@
 		x: 0,
 		y: 0
 	});
-	let width: number = 0;
 
 	let sharedStyle = "";
 	let sharedClass = "";
 
 	$: {
+		const width = element?.clientWidth ?? 0;
+		let xOffset = Math.floor($coords.x / (width / 100));
+		xOffset /= 2;
+		xOffset += 25;
 		sharedStyle = `${styles({
 			"--font-size": fontSize,
 
@@ -76,7 +79,7 @@
 
 			"--icon-color": colors[iconColor],
 
-			"--x-offset": `${Math.floor($coords.x / (width / 100))}%`
+			"--x-offset": `${xOffset}%`
 		})} ${style}`;
 	}
 
@@ -110,7 +113,6 @@
 		on:click={handleClick}
 		on:blur={handleBlur}
 		on:mousemove={storeRelativeCursorPosition(coords)}
-		bind:clientWidth={width}
 		bind:this={element}
 	>
 		<div class="inner">
@@ -130,7 +132,6 @@
 		tabIndex={0}
 		on:click={handleClick}
 		on:mousemove={storeRelativeCursorPosition(coords)}
-		bind:clientWidth={width}
 		bind:this={element}
 	>
 		<div class="inner">
@@ -197,6 +198,26 @@
 			}
 		}
 
+		&.outlined {
+			background-color: transparent;
+			box-shadow: 0 0 0 0.05em $color;
+
+			.shine {
+				background-image: linear-gradient(-65deg, $colorAlpha 48%, transparent 52%);
+			}
+
+			&:not(.hover-disabled) {
+				&:hover {
+					box-shadow: 0 0 0 0.05em $color;
+				}
+
+				&:active,
+				&.active {
+					box-shadow: 0 0 0 0.1em $color;
+				}
+			}
+		}
+
 		&.flat {
 			background-color: transparent;
 			box-shadow: 0 0 0 0.05em transparent;
@@ -253,7 +274,7 @@
 			position: absolute;
 			inset: 0;
 
-			background-size: 220%;
+			background-size: 300%;
 		}
 
 		.inner {

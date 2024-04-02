@@ -3,10 +3,11 @@
 
 	import IoClose from "~icons/ion/close";
 	import IoCheckmark from "~icons/ion/checkmark";
-	import { classNames } from "$utils/generic";
 	import colors from "$constants/colors";
 
 	export let guildMember: WithDbId<DbDiscordMember>;
+
+	$: console.log({ guildMember });
 </script>
 
 <div class="content">

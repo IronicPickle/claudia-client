@@ -7,6 +7,7 @@
 
 	import IoChevronDown from "~icons/ion/chevron-down";
 	import IoChevronUp from "~icons/ion/chevron-up";
+	import ComponentSpawn from "../generic/ComponentSpawn.svelte";
 
 	type Variant = "contained" | "outlined" | "flat";
 
@@ -78,7 +79,7 @@
 
 	$: {
 		if (!options.find((option) => option.value === value)) {
-			handleChange({ value: options[0].value, name: name ?? "" });
+			handleChange({ value: options[0]?.value, name: name ?? "" });
 		}
 	}
 
@@ -131,7 +132,7 @@
 	>
 		<svelte:fragment slot="start">
 			{#if selectedOption?.startIcon}
-				<svelte:component this={selectedOption.startIcon} />
+				<ComponentSpawn options={selectedOption.startIcon} />
 			{:else}
 				<slot name="start" />
 			{/if}
@@ -175,6 +176,7 @@
 
 		:global(.select) {
 			width: 100%;
+			height: 100%;
 
 			:global(.chevron) {
 				transition: transform 150ms ease;

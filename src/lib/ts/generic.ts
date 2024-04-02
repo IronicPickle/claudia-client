@@ -11,6 +11,10 @@ export type JustifyContent =
 	| "center"
 	| "flex-end";
 
+export type FlexDirection = "row" | "column" | "row-reverse" | "column-reverse";
+
+export type Orientation = "horizontal" | "vertical";
+
 export type DiscordAvatarType = "jpg" | "jpeg" | "png" | "webp" | "gif";
 export type DiscordAvatarSize = number;
 
@@ -33,13 +37,10 @@ export interface ChangeData<N, V> {
 }
 
 export interface ComponentSpawnOptions<
-	C extends SvelteComponent<P, E> = any,
-	P extends Record<string, any> = ComponentProps<C>,
-	E extends Record<string, any> = ComponentEvents<C>,
-	S extends Record<string, ComponentSpawnOptions> = any
+	C extends SvelteComponent<P> = any,
+	P extends Record<string, any> = ComponentProps<C>
 > {
 	Component: any;
 	props?: P;
-	slots?: S;
 	content?: any | ComponentSpawnOptions;
 }

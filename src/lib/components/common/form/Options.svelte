@@ -7,6 +7,7 @@
 	import { fade } from "svelte/transition";
 	import { linear } from "svelte/easing";
 	import ComponentSpawn from "../generic/ComponentSpawn.svelte";
+	import { resizeObserver } from "$utils/resizeObserver";
 
 	let clazz: string | undefined = undefined;
 	let id: string | undefined = undefined;
@@ -103,7 +104,7 @@
 	style={styles({
 		"--height": height
 	})}
-	bind:offsetWidth={minWidth}
+	use:resizeObserver={(element) => (minWidth = element.offsetWidth)}
 >
 	<div class="options-inner">
 		{#each options as option}

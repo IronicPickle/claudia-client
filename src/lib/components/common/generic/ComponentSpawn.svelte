@@ -11,17 +11,14 @@
 	export let options: ComponentSpawnOptions;
 </script>
 
-<svelte:component this={options.Component} {...options.props}>
-	{#if isContentComponent(options.content)}
-		<svelte:self options={options.content} />
-	{:else}
-		{options.content}
-	{/if}
-	{#if options.slots}
-		{#each Object.entries(options.slots) as [name, slotOptions]}
-			<div slot={name}>
-				<svelte:self options={slotOptions} />
-			</div>
-		{/each}
-	{/if}
-</svelte:component>
+{#if !options.content}
+	<svelte:component this={options.Component} {...options.props} />
+{:else}
+	<svelte:component this={options.Component} {...options.props}>
+		{#if isContentComponent(options.content)}
+			<svelte:self options={options.content} />
+		{:else}
+			{options.content}
+		{/if}
+	</svelte:component>
+{/if}
