@@ -9,22 +9,15 @@
 <main>
 	<Pane>
 		<div class="pane-inner">
-			<Button fontSize="20px" variant="contained" color="blue-1" justifyContent="center"
-				>Contained</Button
-			>
-			<Button fontSize="20px" variant="outlined" color="blue-1" justifyContent="center"
-				>Outlined</Button
-			>
-			<Button fontSize="20px" variant="flat" color="blue-1" justifyContent="center"
-				>Blue Flat</Button
-			>
-			<Button fontSize="20px" variant="flat" color="red" justifyContent="space-between">
+			<Button variant="contained" color="blue-1" justifyContent="center">Contained</Button>
+			<Button variant="outlined" color="blue-1" justifyContent="center">Outlined</Button>
+			<Button variant="flat" color="blue-1" justifyContent="center">Blue Flat</Button>
+			<Button variant="flat" color="red" justifyContent="space-between">
 				<IoPencil slot="start" />
 				<IoPencil slot="end" />Red Flat</Button
 			>
 
 			<Input variant="contained" color="red" type="password">
-				<IoPencil slot="start" />
 				<IoPencil slot="end" />
 			</Input>
 		</div>

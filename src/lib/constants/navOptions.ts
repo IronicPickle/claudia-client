@@ -1,6 +1,8 @@
 import type Button from "$components/common/generic/Button.svelte";
 import type { ComponentProps, ComponentType } from "svelte";
-import IonPeople from "~icons/ion/people";
+
+import IoPeople from "~icons/ion/people";
+import IoMusicalNotes from "~icons/ion/musical-notes";
 
 interface NavOption extends ComponentProps<Button> {
 	label: string;
@@ -10,7 +12,12 @@ interface NavOption extends ComponentProps<Button> {
 export default [
 	{
 		label: "Members",
-		Icon: IonPeople,
+		Icon: IoPeople,
 		href: "/guild/members"
+	},
+	{
+		label: "Music",
+		Icon: IoMusicalNotes,
+		href: "/guild/music"
 	}
 ] as NavOption[];

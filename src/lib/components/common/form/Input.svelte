@@ -5,12 +5,12 @@
 	import { createEventDispatcher } from "svelte";
 	import { Moon } from "svelte-loading-spinners";
 	import IconButton from "../generic/IconButton.svelte";
-
-	import IoEyeOffOutline from "~icons/ion/eye-off-outline";
-	import IoEyeOutline from "~icons/ion/eye-outline";
 	import { writable } from "svelte/store";
 	import type { CursorCoords } from "$utils/storeRelativeCursorPosition";
 	import storeRelativeCursorPosition from "$utils/storeRelativeCursorPosition";
+
+	import IoEyeOffOutline from "~icons/ion/eye-off-outline";
+	import IoEyeOutline from "~icons/ion/eye-outline";
 
 	type Variant = "contained" | "outlined" | "flat";
 
@@ -24,7 +24,7 @@
 	let wrapperStyle: string | undefined = undefined;
 	export { wrapperClass, wrapperId, wrapperStyle };
 
-	export let fontSize: string = "24px";
+	export let fontSize: string = "20px";
 	export let variant: Variant = "contained";
 
 	export let color: Color = "blue-1";
@@ -38,8 +38,6 @@
 	export let placeholder: string | undefined = undefined;
 	export let autocomplete = false;
 	export let requireShiftEnterForNewLine = false;
-
-	// export let justifyContent: JustifyContent = "space-between";
 
 	export let rounded = false;
 	export let disabled = false;
@@ -76,7 +74,7 @@
 		focus: InputFocusEvent;
 	}>();
 
-	const handleClick = (event: MouseEvent) => {
+	const handleClick = (_event: MouseEvent) => {
 		clearTimeout(clickedTimeout);
 		clicked = true;
 		clickedTimeout = setTimeout(() => {
@@ -130,6 +128,7 @@
 		noError && "no-error",
 		wrapperClass
 	)}
+	id={wrapperId}
 	style={`${styles({
 		"--font-size": fontSize,
 
@@ -193,7 +192,7 @@
 	{:else if type === "password"}
 		<IconButton
 			variant="flat"
-			fontSize={`${Math.floor(parseInt(fontSize) / 1.5)}px`}
+			fontSize={`${Math.floor(parseInt(fontSize) / 1.25)}px`}
 			type="button"
 			color={iconColor}
 			{iconColor}
@@ -204,7 +203,8 @@
 		>
 			{#if passwordOverride}
 				<IoEyeOffOutline />
-			{:else}<IoEyeOutline />
+			{:else}
+				<IoEyeOutline />
 			{/if}
 		</IconButton>
 	{:else}
@@ -253,6 +253,10 @@
 			:global(> *:first-child) {
 				left: 1em;
 			}
+
+			:global(> .button:first-child) {
+				left: 0.75em;
+			}
 		}
 
 		&.has-end-icon {
@@ -264,6 +268,10 @@
 
 			:global(> *:last-child) {
 				right: 1em;
+			}
+
+			:global(> .button:last-child) {
+				right: 0.75em;
 			}
 		}
 
@@ -405,7 +413,6 @@
 			align-items: center;
 
 			width: 100%;
-			height: 100%;
 			min-height: inherit;
 
 			box-shadow: 0 0 0 1px transparent;
@@ -422,11 +429,11 @@
 
 			.input {
 				width: 100%;
-				height: 100%;
+				height: 2.5em;
 				min-height: inherit;
 				min-width: 0;
 
-				padding: 0.355em 1em;
+				padding: 0 1em;
 
 				outline: none;
 				border: none;

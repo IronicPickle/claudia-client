@@ -16,7 +16,7 @@
 
 			<FaDiscord class="icon" />
 
-			<Button fontSize="24px" color="blue-2" href={authUrl}>
+			<Button fontSize="20px" color="blue-2" href={authUrl}>
 				<IoArrowForward slot="end" />
 				Connect
 			</Button>

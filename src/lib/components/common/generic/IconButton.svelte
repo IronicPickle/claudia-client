@@ -15,7 +15,7 @@
 	let style: string | undefined = undefined;
 	export { clazz as class, id, style };
 
-	export let fontSize: string = "24px";
+	export let fontSize: string = "20px";
 	export let variant: Variant = "contained";
 
 	export let color: Color = "blue-1";
@@ -158,6 +158,8 @@
 	a {
 		position: relative;
 
+		@include size(2.5em);
+
 		border-radius: 0.4em;
 		border: none;
 
@@ -280,8 +282,10 @@
 		.inner {
 			display: flex;
 			align-items: center;
+			justify-content: center;
 
-			padding: 0.7em;
+			width: 100%;
+			height: 100%;
 
 			:global(> *:not(span):not(.not-icon)) {
 				@include size(1.25em);

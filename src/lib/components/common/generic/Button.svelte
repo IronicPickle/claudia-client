@@ -2,7 +2,7 @@
 	import colors from "$constants/colors";
 	import { openInNewTabProps } from "$constants/generic";
 	import type { Color, JustifyContent } from "$ts/generic";
-	import { alphaColor, classNames, offsetColor, styles } from "$utils/generic";
+	import { alphaColor, classNames, styles } from "$utils/generic";
 	import storeRelativeCursorPosition from "$utils/storeRelativeCursorPosition";
 	import { type CursorCoords } from "$utils/storeRelativeCursorPosition";
 	import { createEventDispatcher } from "svelte";
@@ -16,7 +16,7 @@
 	let style: string | undefined = undefined;
 	export { clazz as class, id, style };
 
-	export let fontSize: string = "24px";
+	export let fontSize: string = "20px";
 	export let variant: Variant = "contained";
 
 	export let color: Color = "blue-1";
@@ -178,6 +178,8 @@
 	a {
 		position: relative;
 
+		height: 2.5em;
+
 		border-radius: 0.4em;
 		border: none;
 
@@ -320,7 +322,9 @@
 			display: flex;
 			align-items: center;
 
-			padding: 0.6em 1em;
+			height: 100%;
+
+			padding: 0 1em;
 
 			:global(> *:not(span):not(.not-icon)) {
 				color: $iconColor;

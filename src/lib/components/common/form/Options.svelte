@@ -17,7 +17,7 @@
 	let _in: boolean = false;
 	export { _in as in };
 
-	export let fontSize: string = "24px";
+	export let fontSize: string = "20px";
 
 	export let color: Color = "blue-1";
 	export let textColor: Color = "white";

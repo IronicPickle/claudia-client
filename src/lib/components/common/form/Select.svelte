@@ -18,7 +18,7 @@
 
 	export let buttonClassName: string | undefined = undefined;
 
-	export let fontSize: string = "24px";
+	export let fontSize: string = "20px";
 	export let variant: Variant = "contained";
 
 	export let color: Color = "blue-1";
