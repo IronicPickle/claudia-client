@@ -81,8 +81,6 @@
 			"--font-size": fontSize,
 
 			"--color": colors[color],
-			"--color-offset-1": offsetColor(color, 0.1),
-			"--color-offset-2": offsetColor(color, 0.25),
 			"--color-alpha": alphaColor(color, 0.15),
 
 			"--text-color": colors[textColor],

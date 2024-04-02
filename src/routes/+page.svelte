@@ -1,6 +1,9 @@
 <script lang="ts">
+	import Input from "$components/common/form/Input.svelte";
 	import Button from "$components/common/generic/Button.svelte";
 	import Pane from "$components/common/generic/Pane.svelte";
+
+	import IoPencil from "~icons/ion/pencil";
 </script>
 
 <main>
@@ -15,7 +18,15 @@
 			<Button fontSize="20px" variant="flat" color="blue-1" justifyContent="center"
 				>Blue Flat</Button
 			>
-			<Button fontSize="20px" variant="flat" color="red" justifyContent="center">Red Flat</Button>
+			<Button fontSize="20px" variant="flat" color="red" justifyContent="space-between">
+				<IoPencil slot="start" />
+				<IoPencil slot="end" />Red Flat</Button
+			>
+
+			<Input variant="contained" color="red" type="password">
+				<IoPencil slot="start" />
+				<IoPencil slot="end" />
+			</Input>
 		</div>
 	</Pane>
 </main>
