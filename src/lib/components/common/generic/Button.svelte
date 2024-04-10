@@ -179,6 +179,7 @@
 		position: relative;
 
 		height: 2.5em;
+		min-height: 2.5em;
 
 		border-radius: 0.4em;
 		border: none;

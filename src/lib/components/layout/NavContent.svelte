@@ -122,7 +122,7 @@
 
 			.nav-options {
 				:global(.button .inner) {
-					padding: 0.6em;
+					padding: 0 0.6em;
 
 					:global(:not(span)) {
 						margin: 0;
