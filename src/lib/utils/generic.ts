@@ -1,12 +1,16 @@
 import { browser } from "$app/environment";
 import config, { isDev } from "$config/config";
 import colors, { darkColors } from "$constants/colors";
+import { ConsoleColor } from "$shared/lib/enums/generic";
 import type { Color, DiscordAvatarSize, DiscordAvatarType } from "$ts/generic";
 import pSBC from "./pSBC";
 
 export const devLog = (...text: any[]) => {
 	if (isDev) console.log("[Dev]", ">", ...text);
 };
+
+export const logWs = (...text: Array<any>) =>
+	devLog(ConsoleColor.Blue, "[WS]", ConsoleColor.Reset, ...text);
 
 export const pushError = (...args: any[]) => {
 	devLog(...args);

@@ -6,8 +6,6 @@
 	import colors from "$constants/colors";
 
 	export let guildMember: WithDbId<DbDiscordMember>;
-
-	$: console.log({ guildMember });
 </script>
 
 <div class="content">
