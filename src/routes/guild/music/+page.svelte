@@ -1,26 +1,43 @@
 <script lang="ts">
 	import getSelectedDiscordGuild from "$stores/getSelectedDiscordGuild";
 	import openAudioStreamSocket from "$utils/openAudioStreamSocket";
-	import { onDestroy, onMount } from "svelte";
+	import { onDestroy } from "svelte";
 
 	const { store: selectedDiscordGuild } = getSelectedDiscordGuild();
 
-	let socket: Awaited<ReturnType<typeof openAudioStreamSocket>>;
+	let audioStream: Awaited<ReturnType<typeof openAudioStreamSocket>> | undefined;
 
 	const openSocket = async () => {
+		audioStream?.cleanUp();
+
 		if (!$selectedDiscordGuild) return;
-		socket = await openAudioStreamSocket($selectedDiscordGuild?.guildId);
+		audioStream = await openAudioStreamSocket($selectedDiscordGuild?.guildId);
 	};
 
 	selectedDiscordGuild.subscribe(openSocket);
 
 	onDestroy(() => {
-		socket.destroy();
+		audioStream?.cleanUp();
 	});
 </script>
 
-<div class="">
-	<h1>Music</h1>
-</div>
+<main>
+	<div class="header">
+		<h1>Music</h1>
+	</div>
+</main>
 
-<style lang="scss"></style>
+<style lang="scss">
+	main {
+		min-height: inherit;
+
+		.header {
+			padding: 24px 32px;
+
+			h1 {
+				@include quantico(700);
+				color: $white;
+			}
+		}
+	}
+</style>
