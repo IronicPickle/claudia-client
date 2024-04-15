@@ -6,12 +6,12 @@
 	import Avatar from "$components/common/generic/Avatar.svelte";
 	import getNavDrawerIn from "$stores/getNavDrawerIn";
 	import IconButton from "$components/common/generic/IconButton.svelte";
-
-	import IonMenu from "~icons/ion/menu";
 	import Select from "$components/common/form/Select.svelte";
 	import getSelectedDiscordGuild from "$stores/getSelectedDiscordGuild";
 	import getDiscordGuilds from "$stores/getDiscordGuilds";
 	import getBreakpoints from "$stores/getBreakpoints";
+
+	import IonMenu from "~icons/ion/menu";
 
 	const breakpoints = getBreakpoints();
 

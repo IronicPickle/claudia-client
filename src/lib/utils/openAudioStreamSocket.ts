@@ -2,6 +2,7 @@ import config from "$config/config";
 import StorageItem from "$objects/StorageItem";
 import SocketClient from "$shared/lib/objects/SocketClient";
 import type { ApiTokens } from "$shared/lib/ts/api/generic";
+import { get, writable, type Writable } from "svelte/store";
 
 import { OpusDecoder } from "opus-decoder";
 
@@ -16,8 +17,8 @@ const sessionItem = new StorageItem<ApiTokens>("session");
 export default async (guildId: string) => {
 	return new Promise<{
 		socket: SocketClient;
-		audioContext: AudioBuffer | undefined;
-		audioAnalyser: AnalyserNode | undefined;
+		audioContextStore: Writable<AudioContext | undefined>;
+		audioAnalyserStore: Writable<AnalyserNode | undefined>;
 		cleanUp: () => void;
 	}>(async (resolve) => {
 		await opusDecoder.ready;
@@ -25,30 +26,19 @@ export default async (guildId: string) => {
 		const sessionToken = sessionItem.get().data?.sessionToken;
 
 		if (sessionToken) {
-			let audioContext: AudioContext | undefined = undefined;
-			let audioAnalyser: AnalyserNode | undefined = undefined;
+			let audioContextStore = writable<AudioContext | undefined>();
+			let audioAnalyserStore = writable<AnalyserNode | undefined>();
 			let nextTime = 0;
 
-			setInterval(() => {
-				if (!audioAnalyser) return;
-
-				const bufferLength = audioAnalyser.frequencyBinCount;
-				const dataArray = new Uint8Array(bufferLength);
-				audioAnalyser.getByteFrequencyData(dataArray);
-
-				// console.log(dataArray);
-
-				// for (let i = 0; i < bufferLength; i++) {
-				// 	console.log(dataArray[i]);
-				// }
-			}, 623);
-
 			const reset = () => {
+				const audioContext = get(audioContextStore);
+
 				if (audioContext) {
 					audioContext.suspend();
 					audioContext.close();
 				}
-				audioContext = undefined;
+				audioContextStore.set(undefined);
+				audioAnalyserStore.set(undefined);
 				nextTime = 0;
 			};
 
@@ -68,24 +58,22 @@ export default async (guildId: string) => {
 				reset();
 			});
 
-			const playPacket = (streamPacket: Uint8Array) => {
+			const playPacket = async (streamPacket: Uint8Array) => {
 				try {
 					const { channelData, samplesDecoded, sampleRate } = opusDecoder.decodeFrame(streamPacket);
 
+					let audioContext = get(audioContextStore);
+					let audioAnalyser = get(audioAnalyserStore);
+
 					if (!audioContext || !audioAnalyser) {
 						audioContext = new AudioContext();
+						audioAnalyser = audioContext.createAnalyser();
+
+						audioContextStore.set(audioContext);
+						audioAnalyserStore.set(audioAnalyser);
 					}
 
-					audioAnalyser = audioContext.createAnalyser();
-					audioAnalyser.fftSize = 128;
-					audioAnalyser.minDecibels = -90;
-					audioAnalyser.maxDecibels = -10;
-
 					const audioSource = audioContext.createBufferSource();
-
-					audioSource.connect(audioAnalyser);
-
-					audioAnalyser.connect(audioContext.destination);
 
 					const audioBuffer = audioContext.createBuffer(
 						channelData.length,
@@ -100,16 +88,12 @@ export default async (guildId: string) => {
 
 					audioSource.buffer = audioBuffer;
 
+					audioSource.connect(audioAnalyser);
+
+					audioAnalyser.connect(audioContext.destination);
+
 					nextTime += audioBuffer.duration;
 					audioSource.start(nextTime);
-
-					setTimeout(() => {
-						if (!audioAnalyser) return;
-						const bufferLength = audioAnalyser.frequencyBinCount;
-						const dataArray = new Uint8Array(bufferLength);
-						audioAnalyser.getByteFrequencyData(dataArray);
-						console.log(dataArray);
-					}, 10);
 				} catch (err) {
 					return;
 				}
@@ -128,7 +112,7 @@ export default async (guildId: string) => {
 				playPacket(streamPacket);
 			}) as any);
 
-			resolve({ socket, audioContext, audioAnalyser, cleanUp });
+			resolve({ socket, audioContextStore, audioAnalyserStore, cleanUp });
 		}
 	});
 };
