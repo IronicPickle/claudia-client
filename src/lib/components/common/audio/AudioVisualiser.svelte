@@ -1,9 +1,13 @@
 <script lang="ts">
 	import Logo from "$components/media/Logo.svelte";
+	import { sleep } from "$shared/lib/utils/generic";
 	import { alphaColor, styles } from "$utils/generic";
 	import { resizeObserver } from "$utils/resizeObserver";
 
 	export let frequencyData: Uint8Array | undefined;
+
+	let passiveFrequencyData = new Uint8Array();
+	let passiveFrequencyInterval: any;
 
 	const FPS = 40;
 	const CENTER_SIZE = 100;
@@ -14,6 +18,7 @@
 
 	let size = 0;
 	$: size = (width > height ? width : height) - CENTER_SIZE;
+	$: if (size < 0) size = 0;
 
 	let lines = 0;
 	$: lines = size / 2;
@@ -31,9 +36,9 @@
 	const draw = () => {
 		const canvasContext = canvasElement?.getContext("2d");
 
-		const freqeuncyData = frequencyData;
+		const data = frequencyData ?? passiveFrequencyData;
 
-		if (!canvasContext) return;
+		if (!canvasContext || !data) return;
 
 		setTimeout(() => requestAnimationFrame(draw), 1000 / FPS);
 
@@ -41,28 +46,25 @@
 
 		canvasContext.clearRect(0, 0, width, height);
 
-		if (freqeuncyData) {
-			const lineWidth = size / lines;
-			let x = CENTER_SIZE;
+		const lineWidth = size / 1.4 / lines;
+		let x = CENTER_SIZE;
 
-			for (let i = 0; i < lines; i++) {
-				const freqeuncy = freqeuncyData[i];
+		for (let i = 0; i < lines; i++) {
+			const freqeuncy = data[i];
 
-				if (freqeuncy > greatestFrequency) greatestFrequency = freqeuncy;
+			if (freqeuncy > greatestFrequency) greatestFrequency = freqeuncy;
 
-				const percent = freqeuncy / (255 / 100);
+			const percent = freqeuncy / (255 / 100);
 
-				let opacity = percent / 50;
-				if (opacity < 0.05) opacity = 0.05;
+			let opacity = percent / 50;
 
-				canvasContext.strokeStyle = alphaColor("blue-2", opacity);
-				canvasContext.lineWidth = lineWidth;
-				canvasContext.beginPath();
-				canvasContext.arc(width / 2, height / 2, x, 0, Math.PI * 2);
-				canvasContext.stroke();
+			canvasContext.strokeStyle = alphaColor("blue-2", opacity);
+			canvasContext.lineWidth = lineWidth;
+			canvasContext.beginPath();
+			canvasContext.arc(width / 2, height / 2, x, 0, Math.PI * 2);
+			canvasContext.stroke();
 
-				x += lineWidth - LINE_OVERLAP;
-			}
+			x += lineWidth - LINE_OVERLAP;
 		}
 	};
 
@@ -72,6 +74,37 @@
 			canvasContext.clearRect(0, 0, width, height);
 			draw();
 		}
+	}
+
+	const PASSIVE_PROGRESSION_MULTIPLIER = 8;
+	const PASSIVE_PULSE_SLEEP_MULTIPLIER = 1.25;
+
+	const pulse = async () => {
+		for (
+			let offset = -(lines / 2);
+			offset < lines * 1.5;
+			offset += PASSIVE_PROGRESSION_MULTIPLIER
+		) {
+			passiveFrequencyData = new Uint8Array(lines);
+
+			for (let i = 0; i < lines; i++) {
+				let percent = Math.abs(offset - i) / (128 / 100);
+				if (percent > 100) percent = 100;
+				passiveFrequencyData[i] = 100 - percent;
+			}
+
+			await sleep(1000 / FPS);
+		}
+	};
+
+	$: {
+		clearInterval(passiveFrequencyInterval);
+		if (!frequencyData) {
+			const intervalMs = ((lines * 2) / PASSIVE_PROGRESSION_MULTIPLIER) * (1000 / FPS);
+			pulse();
+			passiveFrequencyInterval = setInterval(pulse, intervalMs * PASSIVE_PULSE_SLEEP_MULTIPLIER);
+		}
+		size;
 	}
 </script>
 
