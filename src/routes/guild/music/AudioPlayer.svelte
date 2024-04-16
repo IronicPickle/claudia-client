@@ -27,7 +27,10 @@
 
 	let query = "";
 
-	const handleQueue = () => dispatch("queue", query);
+	const handleQueue = () => {
+		dispatch("queue", query);
+		query = "";
+	};
 </script>
 
 <div

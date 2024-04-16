@@ -2,7 +2,7 @@
 	import getSelectedDiscordGuild from "$stores/getSelectedDiscordGuild";
 	import analyseAudioStream from "$utils/analyseAudioStream";
 	import openAudioStreamSocket from "$utils/openAudioStreamSocket";
-	import { onDestroy } from "svelte";
+	import { onDestroy, onMount } from "svelte";
 	import { writable } from "svelte/store";
 	import AudioVisualiser from "$routes/guild/music/AudioVisualiser.svelte";
 	import AudioPlayer from "./AudioPlayer.svelte";
@@ -11,6 +11,7 @@
 	import type { AudioSourceDetails } from "$shared/lib/ts/audio";
 	import { AudioStreamSocketMessageNames } from "$shared/lib/ts/audioStreamSockets";
 	import { pushError } from "$utils/generic";
+	import type AudioStreamSocketClient from "$objects/AudioStreamSocketClient";
 
 	const { store: selectedDiscordGuild } = getSelectedDiscordGuild();
 
@@ -43,49 +44,84 @@
 	const fetchState = () => {
 		if (!userId || !audioStream?.socket) return;
 		isLoading = true;
-		audioStream.socket.send(AudioStreamSocketMessageNames.StateReq, {
-			userId
-		});
+		audioStream.socket.send(AudioStreamSocketMessageNames.StateReq, {});
 	};
 
 	const queueTrack = (query: string) => {
 		if (!userId || !audioStream?.socket) return;
 		isLoading = true;
 		audioStream.socket.send(AudioStreamSocketMessageNames.PlayReq, {
-			userId,
 			query
 		});
 	};
 
-	$: {
+	const setup = (socket: AudioStreamSocketClient) => {
 		queue = [];
 
-		if (audioStream?.socket) {
-			audioStream.socket.addEventListener("message", ({ name, data }) => {
-				if (name.includes("authenticate")) return;
-				isLoading = false;
+		if (!socket) return;
+		socket.addEventListener("message", ({ name, data }) => {
+			if (name.includes("authenticate")) return;
+			isLoading = false;
 
-				switch (name) {
-					case AudioStreamSocketMessageNames.StateRes: {
-						if (!data.success) return pushError("Failed to fetch state!");
-						queue = data.queue;
+			switch (name) {
+				case AudioStreamSocketMessageNames.StateRes: {
+					if (!data.success) return pushError("Failed to fetch state!");
+					queue = data.queue;
 
-						break;
-					}
-					case AudioStreamSocketMessageNames.PlayRes: {
-						if (!data.success) return pushError("Failed to queue track!");
-						fetchState();
-
-						break;
-					}
+					break;
 				}
-			});
+				case AudioStreamSocketMessageNames.PlayRes: {
+					if (!data.success) return pushError("Failed to queue track!");
+					fetchState();
 
-			audioStream.socket.addEventListener("authenticated", () => {
-				fetchState();
-			});
-		}
-	}
+					break;
+				}
+				case AudioStreamSocketMessageNames.TrackStartEvent: {
+					break;
+				}
+				case AudioStreamSocketMessageNames.TrackEndEvent: {
+					queue = queue.slice(1);
+					break;
+				}
+				case AudioStreamSocketMessageNames.TrackNextEvent: {
+					break;
+				}
+				case AudioStreamSocketMessageNames.TrackPauseEvent: {
+					break;
+				}
+				case AudioStreamSocketMessageNames.TrackResumeEvent: {
+					break;
+				}
+				case AudioStreamSocketMessageNames.TrackSeekEvent: {
+					break;
+				}
+				case AudioStreamSocketMessageNames.TrackStopEvent: {
+					queue = [];
+					break;
+				}
+				case AudioStreamSocketMessageNames.QueueAddEvent: {
+					queue = [...queue, data.track];
+					break;
+				}
+				case AudioStreamSocketMessageNames.QueueSkipEvent: {
+					queue = queue.slice(1);
+					break;
+				}
+				case AudioStreamSocketMessageNames.FilterChangeEvent: {
+					break;
+				}
+				case AudioStreamSocketMessageNames.FilterResetEvent: {
+					break;
+				}
+			}
+		});
+
+		socket.addEventListener("authenticated", () => {
+			fetchState();
+		});
+	};
+
+	$: if (audioStream?.socket) setup(audioStream?.socket);
 </script>
 
 <main>
