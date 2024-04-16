@@ -14,8 +14,8 @@
 
 :global(a) {
 	text-decoration: none;
-	// color: $purple-4;
-	@include inter(600);
+	color: $blue-4;
+	font-weight: 600;
 	cursor: pointer;
 
 	:global(&.disabled) {

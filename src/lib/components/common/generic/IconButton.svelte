@@ -6,6 +6,7 @@
 	import type { CursorCoords } from "$utils/storeRelativeCursorPosition";
 	import storeRelativeCursorPosition from "$utils/storeRelativeCursorPosition";
 	import { createEventDispatcher } from "svelte";
+	import { Moon } from "svelte-loading-spinners";
 	import { writable } from "svelte/store";
 
 	type Variant = "contained" | "outlined" | "flat";
@@ -116,7 +117,11 @@
 		bind:this={element}
 	>
 		<div class="inner">
-			<slot />
+			{#if isLoading}
+				<Moon color={colors[iconColor]} size={parseInt(fontSize) * 1.25} />
+			{:else}
+				<slot />
+			{/if}
 		</div>
 
 		<div class="shine" />
@@ -135,7 +140,11 @@
 		bind:this={element}
 	>
 		<div class="inner">
-			<slot />
+			{#if isLoading}
+				<Moon color={colors[iconColor]} size={parseInt(fontSize) * 1.25} />
+			{:else}
+				<slot />
+			{/if}
 		</div>
 
 		<div class="shine" />

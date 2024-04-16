@@ -47,8 +47,9 @@
 		height: min-content;
 
 		&.flex-grow-buttons {
-			& > * {
-				width: 100%;
+			:global(> *) {
+				flex-grow: 1;
+				width: auto;
 			}
 		}
 

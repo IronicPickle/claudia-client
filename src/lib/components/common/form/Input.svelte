@@ -51,7 +51,7 @@
 	let element: HTMLDivElement | undefined = undefined;
 
 	const hasStartIcon = $$slots["start"];
-	const hasEndIcon = $$slots["end"];
+	const hasEndIcon = $$slots["end"] || isLoading;
 
 	let clicked = false;
 	let clickedTimeout: any;

@@ -1,8 +1,8 @@
 import config from "$config/config";
 import StorageItem from "$objects/StorageItem";
-import SocketClient from "$shared/lib/objects/SocketClient";
 import type { ApiTokens } from "$shared/lib/ts/api/generic";
 import { get, writable, type Writable } from "svelte/store";
+import AudioStreamSocketClient from "$objects/AudioStreamSocketClient";
 
 import { OpusDecoder } from "opus-decoder";
 
@@ -16,7 +16,7 @@ const sessionItem = new StorageItem<ApiTokens>("session");
 
 export default async (guildId: string) => {
 	return new Promise<{
-		socket: SocketClient;
+		socket: AudioStreamSocketClient;
 		audioContextStore: Writable<AudioContext | undefined>;
 		audioAnalyserStore: Writable<AnalyserNode | undefined>;
 		cleanUp: () => void;
@@ -42,8 +42,9 @@ export default async (guildId: string) => {
 				nextTime = 0;
 			};
 
-			const socket = new SocketClient(
+			const socket = new AudioStreamSocketClient(
 				`${config.socketUrl}/guilds/${guildId}/audioStream`,
+				guildId,
 				sessionToken
 			);
 
@@ -51,8 +52,6 @@ export default async (guildId: string) => {
 				socket.destroy();
 				reset();
 			};
-
-			socket.addEventListener("authenticated", () => console.log("authed"));
 
 			socket.addEventListener("open", () => {
 				reset();
