@@ -1,17 +1,17 @@
 <script lang="ts">
 	import Button from "$components/common/generic/Button.svelte";
-	import type { AudioSourceDetails } from "$shared/lib/ts/audio";
 	import { audioSourceIcons } from "$constants/audio";
 	import { audioSourceTypeColors } from "$shared/lib/constants/audio";
 	import { styles } from "$utils/generic";
-	import colors from "$constants/colors";
+	import { getAudioPlayerContext } from "./audioPlayerContext";
 
 	import IoEye from "~icons/ion/eye";
 	import IoEyeOff from "~icons/ion/eye-off";
 
-	export let playerActive: boolean;
+	const { queueStore, playerActiveStore } = getAudioPlayerContext();
 
-	export let currentTrack: AudioSourceDetails | undefined = undefined;
+	let currentTrack = $queueStore[0];
+	$: currentTrack = $queueStore[0];
 </script>
 
 <div class="audio-header">
@@ -34,10 +34,10 @@
 		{/if}
 	</div>
 
-	<Button fontSize="16px" on:click={() => (playerActive = !playerActive)} rounded>
+	<Button fontSize="16px" on:click={() => playerActiveStore.set(!$playerActiveStore)} rounded>
 		Player
 		<svelte:fragment slot="start">
-			{#if playerActive}
+			{#if $playerActiveStore}
 				<IoEyeOff />
 			{:else}
 				<IoEye />

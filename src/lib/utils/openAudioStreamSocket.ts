@@ -14,7 +14,7 @@ const opusDecoder = new OpusDecoder({
 
 const sessionItem = new StorageItem<ApiTokens>("session");
 
-export default async (guildId: string) => {
+export default async (guildId: string, isPausedStore: Writable<boolean>) => {
 	return new Promise<{
 		socket: AudioStreamSocketClient;
 		audioContextStore: Writable<AudioContext | undefined>;
@@ -41,6 +41,10 @@ export default async (guildId: string) => {
 				audioAnalyserStore.set(undefined);
 				nextTime = 0;
 			};
+
+			isPausedStore.subscribe((isPaused) => {
+				if (isPaused) reset();
+			});
 
 			const socket = new AudioStreamSocketClient(
 				`${config.socketUrl}/guilds/${guildId}/audioStream`,

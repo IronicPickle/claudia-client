@@ -23,8 +23,8 @@ export default class AudioStreamSocketClient extends SocketClient<AudioStreamSoc
 			this.logEvent("OPEN");
 		});
 
-		this.addEventListener("close", () => {
-			this.logEvent("CLOSE");
+		this.addEventListener("close", (code, wasClean) => {
+			this.logEvent("CLOSE", "-", code, "-", wasClean ? "clean" : "unclean");
 		});
 	}
 

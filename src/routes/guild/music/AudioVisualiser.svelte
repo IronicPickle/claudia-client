@@ -3,8 +3,9 @@
 	import { sleep } from "$shared/lib/utils/generic";
 	import { alphaColor, styles } from "$utils/generic";
 	import { resizeObserver } from "$utils/resizeObserver";
+	import { getAudioPlayerContext } from "./audioPlayerContext";
 
-	export let frequencyData: Uint8Array | undefined;
+	const { frequencyDataStore } = getAudioPlayerContext();
 
 	let passiveFrequencyData = new Uint8Array();
 	let passiveFrequencyInterval: any;
@@ -36,7 +37,7 @@
 	const draw = () => {
 		const canvasContext = canvasElement?.getContext("2d");
 
-		const data = frequencyData ?? passiveFrequencyData;
+		const data = $frequencyDataStore ?? passiveFrequencyData;
 
 		if (!canvasContext || !data) return;
 
@@ -99,7 +100,7 @@
 
 	$: {
 		clearInterval(passiveFrequencyInterval);
-		if (!frequencyData) {
+		if (!$frequencyDataStore) {
 			const intervalMs = ((lines * 2) / PASSIVE_PROGRESSION_MULTIPLIER) * (1000 / FPS);
 			pulse();
 			passiveFrequencyInterval = setInterval(pulse, intervalMs * PASSIVE_PULSE_SLEEP_MULTIPLIER);

@@ -5,88 +5,84 @@
 	import { audioSourceIcons } from "$constants/audio";
 	import { openInNewTabProps } from "$constants/generic";
 	import { audioSourceTypeColors } from "$shared/lib/constants/audio";
-	import type { AudioSourceDetails } from "$shared/lib/ts/audio";
 	import { parseTime } from "$shared/lib/utils/generic";
-	import getMe from "$stores/getMe";
 	import { styles } from "$utils/generic";
-	import { createEventDispatcher } from "svelte";
 	import { cubicInOut } from "svelte/easing";
 	import { fly } from "svelte/transition";
+	import { getAudioPlayerContext } from "./audioPlayerContext";
 
 	import IoArrowForward from "~icons/ion/arrow-forward";
+	import Form from "$components/common/form/Form.svelte";
 
-	const dispatch = createEventDispatcher<{
-		queue: string;
-	}>();
-
-	export let queue: AudioSourceDetails[] = [];
-	export let isLoading: boolean;
-
-	let userId: string | undefined;
-	getMe().store.subscribe(({ data }) => (userId = data?.discordUser.userId));
+	const { playerActiveStore, queueStore, playTrack, playTrackIsLoading } = getAudioPlayerContext();
 
 	let query = "";
 
-	const handleQueue = () => {
-		dispatch("queue", query);
+	const handlePlay = () => {
+		playTrack(query);
 		query = "";
 	};
 </script>
 
-<div
-	class="audio-player"
-	transition:fly={{
-		duration: 300,
-		easing: cubicInOut,
-		y: 100
-	}}
->
-	<div class="glass"></div>
+{#if $playerActiveStore}
+	<div
+		class="audio-player"
+		transition:fly={{
+			duration: 300,
+			easing: cubicInOut,
+			y: 100
+		}}
+	>
+		<div class="glass"></div>
 
-	<div class="inner">
-		<ButtonGroup flexGrowButtons>
-			<Input
-				variant="outlined"
-				color="blue-3"
-				value={query}
-				placeholder="Play something..."
-				on:change={({ detail }) => (query = detail.value)}
-				disabled={isLoading}
-			/>
-			<IconButton variant="flat" color="blue-3" on:click={handleQueue} {isLoading}>
-				<IoArrowForward />
-			</IconButton>
-		</ButtonGroup>
+		<div class="inner">
+			<Form on:submit={handlePlay}>
+				<ButtonGroup flexGrowButtons>
+					<Input
+						variant="outlined"
+						color="blue-3"
+						value={query}
+						placeholder="Play something..."
+						disabled={$playTrackIsLoading}
+						on:change={({ detail }) => (query = detail.value)}
+					/>
+					<IconButton type="submit" variant="flat" color="blue-3" isLoading={$playTrackIsLoading}>
+						<IoArrowForward />
+					</IconButton>
+				</ButtonGroup>
+			</Form>
 
-		<div class="queue">
-			<h1>Queue</h1>
-			<div class="tracks">
-				{#each queue as track}
-					{@const { hours, minutes, seconds } = parseTime(track.duration ?? 0)}
+			<div class="queue">
+				<h1>Queue</h1>
+				<div class="tracks">
+					{#each $queueStore as track}
+						{@const { hours, minutes, seconds, hoursPadded, minutesPadded, secondsPadded } =
+							parseTime(track.duration ?? 0)}
 
-					<div class="track">
-						<a href={track.url} {...openInNewTabProps}>{track.title}</a>
-						<h2>
-							<svelte:component
-								this={audioSourceIcons[track.type]}
-								style={styles({
-									color: audioSourceTypeColors[track.type].split("x")[1]
-								})}
-							/>
-							{track.artist}
-							{#if track.album}
-								- ({track.album})
-							{/if}
-						</h2>
-						<h3>
-							{#if hours > 0}{hours}:{/if}{#if minutes > 0}{minutes}:{/if}{seconds}
-						</h3>
-					</div>
-				{/each}
+						<div class="track">
+							<a href={track.url} {...openInNewTabProps}>{track.title}</a>
+							<h2>
+								<svelte:component
+									this={audioSourceIcons[track.type]}
+									style={styles({
+										color: audioSourceTypeColors[track.type].split("x")[1]
+									})}
+								/>
+								{track.artist}
+								{#if track.album}
+									- ({track.album})
+								{/if}
+							</h2>
+							<h3>
+								{#if hours > 0}{hoursPadded}:{/if}{#if minutes > 0}{minutesPadded}:{/if}{secondsPadded}
+							</h3>
+						</div>
+					{/each}
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
+{/if}
 
 <style lang="scss">
 	.audio-player {
@@ -97,7 +93,7 @@
 		display: flex;
 		flex-direction: column;
 
-		margin: 0 64px 64px 64px;
+		margin: 0 64px 0 64px;
 
 		border-radius: 20px;
 
