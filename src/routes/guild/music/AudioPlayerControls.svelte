@@ -10,6 +10,7 @@
 	import IoPlay from "~icons/ion/play";
 	import { parseTime } from "$shared/lib/utils/generic";
 	import { classNames } from "$utils/generic";
+	import Slider from "$components/common/form/Slider.svelte";
 
 	const {
 		playerActiveStore,
@@ -35,7 +36,10 @@
 	$: duration = $queueStore[0]?.duration ?? 0;
 
 	let percent = 0;
-	$: percent = $trackPositionStore / (duration / 100);
+	$: {
+		percent = $trackPositionStore / (duration / 100);
+		if (isNaN(percent)) percent = 0;
+	}
 </script>
 
 <div class={classNames("audio-player-controls", $playerActiveStore && "player-active")}>
@@ -103,11 +107,10 @@
 				{/if}
 			</p>
 
-			<input
-				type="range"
+			<Slider
 				value={percent}
-				on:change={({ currentTarget: { value } }) => {
-					const position = (duration / 100) * parseInt(value);
+				on:change={({ detail: { value } }) => {
+					const position = (duration / 100) * value;
 					seek(position);
 				}}
 				disabled={$seekIsLoading}
@@ -124,12 +127,11 @@
 				{/if}
 			</p>
 
-			<input
-				type="range"
+			<Slider
 				value={$filtersStore?.volume ?? 0}
-				on:change={({ currentTarget: { value } }) => {
+				on:change={({ detail: { value } }) => {
 					if (!$filtersStore) return;
-					setFilters({ ...$filtersStore, volume: parseInt(value) });
+					setFilters({ ...$filtersStore, volume: value });
 				}}
 				disabled={$setFiltersIsLoading}
 				step={1}
