@@ -29,6 +29,10 @@
 		flex-direction: column;
 		gap: 16px;
 
+		max-height: calc(100vh - 80px);
+
+		overflow: hidden;
+
 		.visualiser-wrapper {
 			position: absolute;
 

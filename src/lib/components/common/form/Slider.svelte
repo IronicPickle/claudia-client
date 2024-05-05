@@ -102,7 +102,7 @@
 	$thumbColorOffset: var(--thumb-color-offset);
 
 	.slider {
-		height: 0.6em;
+		height: 0.5em;
 		width: 100%;
 
 		appearance: none;

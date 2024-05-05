@@ -59,24 +59,33 @@
 						{@const { hours, minutes, seconds, hoursPadded, minutesPadded, secondsPadded } =
 							parseTime(track.duration ?? 0)}
 
-						<div class="track">
-							<a href={track.url} {...openInNewTabProps}>{track.title}</a>
-							<h2>
-								<svelte:component
-									this={audioSourceIcons[track.type]}
-									style={styles({
-										color: audioSourceTypeColors[track.type].split("x")[1]
-									})}
-								/>
-								{track.artist}
-								{#if track.album}
-									- ({track.album})
-								{/if}
-							</h2>
-							<h3>
-								{#if hours > 0}{hoursPadded}:{/if}{#if minutes > 0}{minutesPadded}:{/if}{secondsPadded}
-							</h3>
-						</div>
+						{#key track.id}
+							<div
+								class="track"
+								transition:fly={{
+									duration: 300,
+									easing: cubicInOut,
+									x: 100
+								}}
+							>
+								<a href={track.url} {...openInNewTabProps}>{track.title}</a>
+								<h2>
+									<svelte:component
+										this={audioSourceIcons[track.type]}
+										style={styles({
+											color: audioSourceTypeColors[track.type].split("x")[1]
+										})}
+									/>
+									{track.artist}
+									{#if track.album}
+										- ({track.album})
+									{/if}
+								</h2>
+								<h3>
+									{#if hours > 0}{hoursPadded}:{/if}{#if minutes > 0}{minutesPadded}:{/if}{secondsPadded}
+								</h3>
+							</div>
+						{/key}
 					{/each}
 				</div>
 			</div>
@@ -112,8 +121,12 @@
 		}
 
 		.inner {
+			flex-grow: 1;
+
 			display: flex;
 			flex-direction: column;
+
+			min-height: 0;
 
 			margin: 32px;
 
@@ -126,6 +139,13 @@
 			}
 
 			.queue {
+				flex-grow: 1;
+
+				display: flex;
+				flex-direction: column;
+
+				min-height: 0;
+
 				margin: 24px 16px;
 
 				h1 {
@@ -135,14 +155,32 @@
 				}
 
 				.tracks {
+					flex-grow: 1;
+
 					display: flex;
 					flex-direction: column;
 					gap: 16px;
 
+					min-height: 0;
+
 					margin-top: 16px;
 
+					overflow: hidden auto;
+
 					.track {
+						padding: 8px 12px;
+
+						border-radius: 8px;
+
+						transition: background-color 200ms ease;
+
+						&:hover {
+							background-color: rgba($blue-5, 0.05);
+						}
+
 						a {
+							width: fit-content;
+
 							@include quantico(700);
 							font-size: 18px;
 

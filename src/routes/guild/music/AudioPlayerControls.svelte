@@ -49,6 +49,7 @@
 		<div>
 			<ButtonGroup mergeCorners>
 				<IconButton
+					variant={$playerActiveStore ? "contained" : "flat"}
 					fontSize="14px"
 					on:click={() => seek(0)}
 					isLoading={$seekIsLoading}
@@ -57,6 +58,7 @@
 					<IoPlaySkipBack />
 				</IconButton>
 				<IconButton
+					variant={$playerActiveStore ? "contained" : "flat"}
 					fontSize="14px"
 					on:click={stopTrack}
 					isLoading={$stopTrackIsLoading}
@@ -66,6 +68,7 @@
 				</IconButton>
 				{#if $isPausedStore}
 					<IconButton
+						variant={$playerActiveStore ? "contained" : "flat"}
 						fontSize="14px"
 						on:click={resumeTrack}
 						isLoading={$resumeTrackIsLoading}
@@ -75,6 +78,7 @@
 					</IconButton>
 				{:else}
 					<IconButton
+						variant={$playerActiveStore ? "contained" : "flat"}
 						fontSize="14px"
 						on:click={pauseTrack}
 						isLoading={$pauseTrackIsLoading}
@@ -84,6 +88,7 @@
 					</IconButton>
 				{/if}
 				<IconButton
+					variant={$playerActiveStore ? "contained" : "flat"}
 					fontSize="14px"
 					on:click={skipTrack}
 					isLoading={$skipTrackIsLoading}
@@ -113,7 +118,7 @@
 					const position = (duration / 100) * value;
 					seek(position);
 				}}
-				disabled={$seekIsLoading}
+				disabled={$seekIsLoading || !$queueStore[0]}
 				step={0.01}
 			/>
 		</div>
@@ -159,7 +164,7 @@
 			border-radius: 0;
 
 			.inner {
-				margin: 24px 24px;
+				margin: 8px 16px;
 			}
 		}
 

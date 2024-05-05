@@ -42,8 +42,8 @@ export default async (guildId: string, isPausedStore: Writable<boolean>) => {
 				nextTime = 0;
 			};
 
-			isPausedStore.subscribe((isPaused) => {
-				if (isPaused) reset();
+			isPausedStore.subscribe(() => {
+				reset();
 			});
 
 			const socket = new AudioStreamSocketClient(

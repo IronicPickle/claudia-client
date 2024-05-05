@@ -148,6 +148,7 @@ export const setAudioPlayerContext = () => {
 				}
 				case AudioStreamSocketMessageNames.TrackNextEvent: {
 					queueStore.set(get(queueStore).slice(1));
+					trackPositionStore.set(0);
 					break;
 				}
 				case AudioStreamSocketMessageNames.TrackPauseEvent: {
