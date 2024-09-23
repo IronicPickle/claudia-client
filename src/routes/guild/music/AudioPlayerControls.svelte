@@ -38,7 +38,7 @@
 	let percent = 0;
 	$: {
 		percent = $trackPositionStore / (duration / 100);
-		if (isNaN(percent)) percent = 0;
+		if (isNaN(percent) || percent === Infinity) percent = 0;
 	}
 </script>
 
