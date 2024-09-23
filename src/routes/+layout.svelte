@@ -1,6 +1,9 @@
 <script lang="ts">
 	import Header from "$components/layout/Header.svelte";
+	import type { ApiTokens } from "$shared/lib/ts/api/generic";
+	import storageItem from "$utils/storageItem";
 	import NavDrawer from "../lib/components/layout/NavDrawer.svelte";
+	import { page } from "$app/stores";
 
 	import dayjs from "dayjs";
 	import advancedFormat from "dayjs/plugin/advancedFormat";
@@ -8,6 +11,13 @@
 
 	dayjs.extend(advancedFormat);
 	dayjs.extend(customParseFormat);
+
+	const { item } = storageItem<ApiTokens>("session");
+
+	$: {
+		if (!$item.data && !$page.url.pathname.startsWith("/auth"))
+			window.location.replace("/auth/login");
+	}
 </script>
 
 <div class="root">

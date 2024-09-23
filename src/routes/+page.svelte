@@ -2,10 +2,10 @@
 	import Button from "$components/common/generic/Button.svelte";
 	import Pane from "$components/common/generic/Pane.svelte";
 	import Logo from "$components/media/Logo.svelte";
+	import Divider from "$components/common/generic/Divider.svelte";
 
 	import IonMusicNote from "~icons/ion/music-note";
 	import IonArrowForward from "~icons/ion/arrow-forward";
-	import Divider from "$components/common/generic/Divider.svelte";
 </script>
 
 <main>
