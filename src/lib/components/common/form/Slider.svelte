@@ -1,6 +1,5 @@
 <script lang="ts">
 	import colors from "$constants/colors";
-	import { ConsoleColor } from "$shared/lib/enums/generic";
 	import type { ChangeData, Color } from "$ts/generic";
 	import { classNames, offsetColor, styles } from "$utils/generic";
 	import { createEventDispatcher } from "svelte";
@@ -41,11 +40,12 @@
 
 	let isFocussed = false;
 
-	const handleChange = ({ currentTarget }: InputChangeEvent) =>
+	const handleChange = ({ currentTarget }: InputChangeEvent) => {
 		dispatch("change", {
 			name: currentTarget.name ?? "",
 			value: parseInt(currentTarget.value)
 		});
+	};
 	const handleBlur = (event: InputFocusEvent) => {
 		isFocussed = false;
 		dispatch("blur", event);
@@ -61,7 +61,9 @@
 	};
 
 	let gradient = getGradient(value, min, max);
-	$: gradient = getGradient(value, min, max);
+	$: {
+		if (!isFocussed) gradient = getGradient(value, min, max);
+	}
 </script>
 
 <input
@@ -97,7 +99,6 @@
 	on:blur={handleBlur}
 	on:focus={handleFocus}
 	on:input={({ currentTarget: { min, max, value } }) => {
-		if (isFocussed) return;
 		gradient = getGradient(parseInt(value), parseInt(min), parseInt(max));
 	}}
 />
