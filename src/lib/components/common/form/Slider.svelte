@@ -39,13 +39,21 @@
 		focus: InputFocusEvent;
 	}>();
 
+	let isFocussed = false;
+
 	const handleChange = ({ currentTarget }: InputChangeEvent) =>
 		dispatch("change", {
 			name: currentTarget.name ?? "",
 			value: parseInt(currentTarget.value)
 		});
-	const handleBlur = (event: InputFocusEvent) => dispatch("blur", event);
-	const handleFocus = (event: InputFocusEvent) => dispatch("focus", event);
+	const handleBlur = (event: InputFocusEvent) => {
+		isFocussed = false;
+		dispatch("blur", event);
+	};
+	const handleFocus = (event: InputFocusEvent) => {
+		isFocussed = true;
+		dispatch("focus", event);
+	};
 
 	const getGradient = (value: number, min: number, max: number) => {
 		const percent = ((value - min) / (max - min)) * 100;
@@ -79,7 +87,7 @@
 	})}${style}`}
 	{id}
 	{name}
-	{value}
+	value={isFocussed ? undefined : value}
 	{min}
 	{max}
 	{step}
@@ -89,6 +97,7 @@
 	on:blur={handleBlur}
 	on:focus={handleFocus}
 	on:input={({ currentTarget: { min, max, value } }) => {
+		if (isFocussed) return;
 		gradient = getGradient(parseInt(value), parseInt(min), parseInt(max));
 	}}
 />
