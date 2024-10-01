@@ -47,8 +47,6 @@ npm i
 
 if [ ! -e .env ]; then
   printf "Generating .env file"
-  echo "DENO_ENV=development" >> .env
-  echo "" >> .env
   echo "VITE_DISCORD_CLIENT_ID=" >> .env
 else
   printf ".env already exists, skipping..."
