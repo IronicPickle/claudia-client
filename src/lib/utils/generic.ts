@@ -5,6 +5,7 @@ import type { Color, DiscordAvatarSize, DiscordAvatarType } from "$ts/generic";
 import pSBC from "./pSBC";
 
 export const devLog = (...text: any[]) => {
+	console.log({ isDev }, ...text);
 	if (isDev) console.log("[Dev]", ">", ...text);
 };
 
