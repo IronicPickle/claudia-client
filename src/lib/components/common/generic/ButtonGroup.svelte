@@ -49,7 +49,7 @@
 		&.flex-grow-buttons {
 			:global(> *) {
 				flex-grow: 1;
-				width: auto;
+				width: auto !important;
 			}
 		}
 
