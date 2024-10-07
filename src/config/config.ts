@@ -12,8 +12,8 @@ export interface Config {
 
 const env = import.meta.env.MODE;
 
-export const isDev = import.meta.env.DEV;
-export const isProd = import.meta.env.PROD;
+export const isDev = env === "development";
+export const isProd = env === "production";
 
 const config: Record<string, Config> = {
 	development: developmentConfig,
