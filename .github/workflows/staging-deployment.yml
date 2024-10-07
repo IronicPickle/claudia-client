@@ -36,12 +36,12 @@ jobs:
         run: tar -czf dist.tar.gz ./dist
 
       - name: Copy build to remote
-        run: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./dist.tar.gz home-server@ironicpickle.uk:/home/home-client/claudia/staging/claudia-client
+        run: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./dist.tar.gz home-server@ironicpickle.uk:/home/home-server/claudia/staging/claudia-client
 
       - name: Deploy to remote
         run: |
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null home-server@ironicpickle.uk "\
-            cd /home/home-client/claudia/staging/claudia-client
+            cd /home/home-server/claudia/staging/claudia-client
             rm ./dist -rf && \
             tar -xzf dist.tar.gz && \
             rm dist.tar.gz"
